@@ -141,7 +141,7 @@ func main() {
 	
 	if promoteCfg.EnableAutoPromote {
 		logger.Success("🚀 Auto Promote System is READY!")
-		logger.Info("Commands: .promote, .disablepromote, .promotehelp")
+		logger.Info("Commands: .aca, .disableaca, .promotehelp")
 	}
 	
 	logger.Info("Tekan Ctrl+C untuk menghentikan bot")

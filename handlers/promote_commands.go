@@ -33,11 +33,11 @@ func NewPromoteCommandHandler(
 	}
 }
 
-// HandlePromoteCommand menangani command .promote
-func (h *PromoteCommandHandler) HandlePromoteCommand(evt *events.Message) string {
+// HandleAcaCommand menangani command .aca (dulu .promote)
+func (h *PromoteCommandHandler) HandleAcaCommand(evt *events.Message) string {
 	// Hanya bisa digunakan di grup
 	if evt.Info.Chat.Server != types.GroupServer {
-		return "❌ Command .promote hanya bisa digunakan di grup!"
+		return "❌ Command .aca hanya bisa digunakan di grup!"
 	}
 
 	groupJID := evt.Info.Chat.String()
@@ -49,26 +49,14 @@ func (h *PromoteCommandHandler) HandlePromoteCommand(evt *events.Message) string
 		return fmt.Sprintf("❌ Gagal mengaktifkan auto promote: %s", err.Error())
 	}
 
-	return `✅ *AUTO PROMOTE DIAKTIFKAN!* 🚀
-
-🎯 **Status:** Aktif untuk grup ini
-⏰ **Interval:** Setiap 4 jam sekali
-📝 **Template:** Random dari template yang tersedia
-🔄 **Mulai:** Promosi pertama akan dikirim dalam 4 jam
-
-💡 **Info:**
-• Gunakan .disablepromote untuk menghentikan
-• Gunakan .statuspromo untuk cek status
-• Gunakan .testpromo untuk test kirim promosi
-
-🎉 Selamat! Auto promote sudah aktif untuk grup ini.`
+	return `Hehe~ panggil aku terus ya, onii-chan~ 💕`
 }
 
-// HandleDisablePromoteCommand menangani command .disablepromote
-func (h *PromoteCommandHandler) HandleDisablePromoteCommand(evt *events.Message) string {
+// HandleDisableAcaCommand menangani command .disableaca (dulu .disablepromote)
+func (h *PromoteCommandHandler) HandleDisableAcaCommand(evt *events.Message) string {
 	// Hanya bisa digunakan di grup
 	if evt.Info.Chat.Server != types.GroupServer {
-		return "❌ Command .disablepromote hanya bisa digunakan di grup!"
+		return "❌ Command .disableaca hanya bisa digunakan di grup!"
 	}
 
 	groupJID := evt.Info.Chat.String()
@@ -80,17 +68,7 @@ func (h *PromoteCommandHandler) HandleDisablePromoteCommand(evt *events.Message)
 		return fmt.Sprintf("❌ Gagal menonaktifkan auto promote: %s", err.Error())
 	}
 
-	return `🛑 *AUTO PROMOTE DINONAKTIFKAN!*
-
-❌ **Status:** Tidak aktif untuk grup ini
-⏹️ **Promosi otomatis dihentikan**
-
-💡 **Info:**
-• Gunakan .promote untuk mengaktifkan kembali
-• Template dan pengaturan tetap tersimpan
-• Anda bisa mengaktifkan kapan saja
-
-👋 Auto promote berhasil dinonaktifkan untuk grup ini.`
+	return `Hyaa! Baka onii-chan, jangan ganggu aku >///<`
 }
 
 // HandleStatusPromoCommand menangani command .statuspromo
@@ -201,7 +179,8 @@ func (h *PromoteCommandHandler) HandleListTemplatesCommand(evt *events.Message) 
 • Admin belum menambahkan template promosi
 • Gunakan .addtemplate untuk menambah template (admin only)
 • Contoh: .addtemplate "Promo Hari Ini" "diskon" "🔥 Diskon 50%!"
-• Gunakan .alltemplates untuk melihat semua template`
+• Gunakan .alltemplates untuk melihat semua template
+• Gunakan .aca untuk mengaktifkan auto promote`
 	}
 
 	var result strings.Builder
@@ -332,10 +311,10 @@ func (h *PromoteCommandHandler) HandleHelpCommand(evt *events.Message) string {
 
 🎯 *COMMANDS USER:*
 
-• *.promote*
+• *.aca*
   Aktifkan auto promote di grup
 
-• *.disablepromote*
+• *.disableaca*
   Nonaktifkan auto promote di grup
 
 • *.statuspromo*
@@ -399,7 +378,7 @@ func (h *PromoteCommandHandler) HandleHelpCommand(evt *events.Message) string {
 💡 *CARA PENGGUNAAN:*
 
 1️⃣ *Aktivasi Auto Promote:*
-   • Ketik .promote di grup
+   • Ketik .aca di grup
    • Bot akan kirim promosi setiap 4 jam
    • Template dipilih random
 
@@ -489,8 +468,8 @@ func (h *PromoteCommandHandler) IsPromoteCommand(messageText string) bool {
 	lowerText := strings.ToLower(strings.TrimSpace(messageText))
 	
 	promoteCommands := []string{
-		".promote",
-		".disablepromote", 
+		".aca",
+		".disableaca", 
 		".statuspromo",
 		".testpromo",
 		".listtemplates",
@@ -531,11 +510,11 @@ func (h *PromoteCommandHandler) HandlePromoteCommands(evt *events.Message, messa
 	command := args[0]
 	
 	switch command {
-	case ".promote":
-		return h.HandlePromoteCommand(evt)
+	case ".aca":
+		return h.HandleAcaCommand(evt)
 		
-	case ".disablepromote":
-		return h.HandleDisablePromoteCommand(evt)
+	case ".disableaca":
+		return h.HandleDisableAcaCommand(evt)
 		
 	case ".statuspromo":
 		return h.HandleStatusPromoCommand(evt)
