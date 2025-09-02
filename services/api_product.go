@@ -219,11 +219,16 @@ Stok menipis, buruan order!
 
 🎯 *ORDER SEKARANG:*
 
-📱 *WhatsApp:*
-   wa.me/6287786388052
+🤖 *BOT OTOMATIS:*
+📱 WhatsApp: wa.me/6287786388052
+🤖 Telegram: https://t.me/grnstoreofficial_bot
 
-🤖 *Telegram:*
-   https://t.me/grnstoreofficial_bot
+👨‍💼 *ADMIN MANUAL:*
+📱 Admin 1: wa.me/6285150588080
+📱 Admin 2: wa.me/6285117557905
+
+👥 *JOIN GROUP:*
+🔗 https://chat.whatsapp.com/IeIXOndIoFr0apnlKzghUC
 
 ⏰ *JAM OPERASIONAL:*
    🟢 BUKA: 01:00 - 23:00 WIB
@@ -254,8 +259,17 @@ func (s *APIProductService) generateProductTemplate(product Product) string {
 📝 **Detail:** %s
 
 🎯 **Order Sekarang:**
+
+🤖 **BOT OTOMATIS:**
 📱 WhatsApp: wa.me/6287786388052
 🤖 Telegram: https://t.me/grnstoreofficial_bot
+
+👨‍💼 **ADMIN MANUAL:**
+📱 Admin 1: wa.me/6285150588080
+📱 Admin 2: wa.me/6285117557905
+
+👥 **JOIN GROUP:**
+🔗 https://chat.whatsapp.com/IeIXOndIoFr0apnlKzghUC
 
 ⚡ *Stok terbatas, buruan order!*
 🔥 *Jangan sampai nyesal kemudian!*
