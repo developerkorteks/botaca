@@ -17,9 +17,7 @@ services:
       - TZ=Asia/Jakarta
     networks:
       - bot-network
-    # Optional: expose port for monitoring
-    ports:
-      - "8080:8080"
+    # No ports needed - WhatsApp bot only connects outbound
     # Resource limits
     deploy:
       resources:

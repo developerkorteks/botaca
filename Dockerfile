@@ -40,8 +40,7 @@ RUN mkdir -p /app/data
 # Set permissions
 RUN chmod +x ./bot
 
-# Expose port (if needed for health checks)
-EXPOSE 8080
+# No port exposure needed for WhatsApp bot
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
