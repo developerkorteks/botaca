@@ -13,7 +13,7 @@ func RunMigrations(db *sql.DB) error {
 		createPromoteTemplatesTable,
 		createPromoteLogsTable,
 		createPromoteStatsTable,
-		insertDefaultTemplates,
+		// insertDefaultTemplates, // Dinonaktifkan - admin akan isi manual
 	}
 
 	for i, migration := range migrations {
@@ -25,6 +25,7 @@ func RunMigrations(db *sql.DB) error {
 	}
 
 	fmt.Println("✅ All migrations completed successfully!")
+	fmt.Println("💡 Template database ready - admin can add templates manually")
 	return nil
 }
 

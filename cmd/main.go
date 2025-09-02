@@ -81,10 +81,11 @@ func main() {
 		// Setup services
 		templateService = services.NewTemplateService(promoteRepo, logger)
 		autoPromoteService = services.NewAutoPromoteService(client, promoteRepo, logger)
+		apiProductService := services.NewAPIProductService(templateService, logger)
 		
 		// Setup command handlers
 		promoteCommandHandler = handlers.NewPromoteCommandHandler(autoPromoteService, templateService, logger)
-		adminCommandHandler = handlers.NewAdminCommandHandler(autoPromoteService, templateService, logger, promoteCfg.AdminNumbers)
+		adminCommandHandler = handlers.NewAdminCommandHandler(autoPromoteService, templateService, apiProductService, logger, promoteCfg.AdminNumbers)
 		
 		logger.Success("Auto Promote System initialized!")
 	}

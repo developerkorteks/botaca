@@ -58,7 +58,7 @@ func getAdminNumbers() []string {
 		// Default admin numbers (ganti dengan nomor Anda)
 		return []string{
 			"6285117557905", // Ganti dengan nomor admin utama
-			"628987654321",  // Tambahkan nomor admin lain jika perlu
+			"6285150588080", // Tambahkan nomor admin lain jika perlu
 		}
 	}
 

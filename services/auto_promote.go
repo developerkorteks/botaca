@@ -142,14 +142,20 @@ func (s *AutoPromoteService) StopScheduler() {
 	s.logger.Success("Auto promote scheduler stopped!")
 }
 
-// processScheduledPromotes memproses promosi terjadwal
+// processScheduledPromotes memproses promosi terjadwal dengan error handling yang robust
 func (s *AutoPromoteService) processScheduledPromotes() {
+	defer func() {
+		if r := recover(); r != nil {
+			s.logger.Errorf("Scheduler panic recovered: %v", r)
+		}
+	}()
+
 	s.logger.Info("Processing scheduled promotes...")
 	
-	// Ambil semua grup yang aktif
-	activeGroups, err := s.repository.GetActiveGroups()
+	// Ambil semua grup yang aktif dengan retry mechanism
+	activeGroups, err := s.getActiveGroupsWithRetry(3)
 	if err != nil {
-		s.logger.Errorf("Failed to get active groups: %v", err)
+		s.logger.Errorf("Failed to get active groups after retries: %v", err)
 		return
 	}
 	
@@ -160,10 +166,10 @@ func (s *AutoPromoteService) processScheduledPromotes() {
 	
 	s.logger.Infof("Found %d active groups", len(activeGroups))
 	
-	// Ambil template aktif
-	templates, err := s.repository.GetActiveTemplates()
+	// Ambil template aktif dengan retry mechanism
+	templates, err := s.getActiveTemplatesWithRetry(3)
 	if err != nil {
-		s.logger.Errorf("Failed to get templates: %v", err)
+		s.logger.Errorf("Failed to get templates after retries: %v", err)
 		return
 	}
 	
@@ -172,36 +178,47 @@ func (s *AutoPromoteService) processScheduledPromotes() {
 		return
 	}
 	
-	// Proses setiap grup
+	s.logger.Infof("Found %d active templates", len(templates))
+	
+	// Proses setiap grup dengan error handling individual
 	successCount := 0
 	failCount := 0
+	skippedCount := 0
 	
 	for _, group := range activeGroups {
 		// Cek apakah sudah waktunya untuk promote (4 jam sejak terakhir)
 		if s.shouldSkipGroup(&group) {
+			skippedCount++
+			s.logger.Debugf("Skipping group %s (not yet time)", group.GroupJID)
 			continue
 		}
 		
-		// Kirim promosi
-		err := s.sendPromoteToGroup(group.GroupJID, templates)
+		// Kirim promosi dengan retry mechanism
+		err := s.sendPromoteToGroupWithRetry(group.GroupJID, templates, 2)
 		if err != nil {
-			s.logger.Errorf("Failed to send promote to group %s: %v", group.GroupJID, err)
+			s.logger.Errorf("Failed to send promote to group %s after retries: %v", group.GroupJID, err)
 			failCount++
 		} else {
 			successCount++
 			
-			// Update last promote time
+			// Update last promote time dengan error handling
 			now := time.Now()
 			group.LastPromoteAt = &now
-			s.repository.UpdateAutoPromoteGroup(&group)
+			updateErr := s.repository.UpdateAutoPromoteGroup(&group)
+			if updateErr != nil {
+				s.logger.Errorf("Failed to update group %s last promote time: %v", group.GroupJID, updateErr)
+			}
 		}
 	}
 	
-	s.logger.Infof("Scheduled promotes completed: %d success, %d failed", successCount, failCount)
+	s.logger.Infof("Scheduled promotes completed: %d success, %d failed, %d skipped", successCount, failCount, skippedCount)
 	
-	// Update statistik
+	// Update statistik dengan error handling
 	today := time.Now().Format("2006-01-02")
-	s.repository.UpdateStats(today, len(activeGroups), successCount+failCount, successCount, failCount)
+	statsErr := s.repository.UpdateStats(today, len(activeGroups), successCount+failCount, successCount, failCount)
+	if statsErr != nil {
+		s.logger.Errorf("Failed to update stats: %v", statsErr)
+	}
 }
 
 // shouldSkipGroup mengecek apakah grup harus dilewati
@@ -329,6 +346,74 @@ func (s *AutoPromoteService) GetActiveGroupsCount() (int, error) {
 		return 0, err
 	}
 	return len(groups), nil
+}
+
+// GetActiveGroups mendapatkan daftar grup aktif
+func (s *AutoPromoteService) GetActiveGroups() ([]database.AutoPromoteGroup, error) {
+	return s.repository.GetActiveGroups()
+}
+
+// getActiveGroupsWithRetry mengambil grup aktif dengan retry mechanism
+func (s *AutoPromoteService) getActiveGroupsWithRetry(maxRetries int) ([]database.AutoPromoteGroup, error) {
+	var lastErr error
+	
+	for i := 0; i < maxRetries; i++ {
+		groups, err := s.repository.GetActiveGroups()
+		if err == nil {
+			return groups, nil
+		}
+		
+		lastErr = err
+		s.logger.Warningf("Retry %d/%d getting active groups failed: %v", i+1, maxRetries, err)
+		
+		if i < maxRetries-1 {
+			time.Sleep(time.Duration(i+1) * time.Second) // Exponential backoff
+		}
+	}
+	
+	return nil, lastErr
+}
+
+// getActiveTemplatesWithRetry mengambil template aktif dengan retry mechanism
+func (s *AutoPromoteService) getActiveTemplatesWithRetry(maxRetries int) ([]database.PromoteTemplate, error) {
+	var lastErr error
+	
+	for i := 0; i < maxRetries; i++ {
+		templates, err := s.repository.GetActiveTemplates()
+		if err == nil {
+			return templates, nil
+		}
+		
+		lastErr = err
+		s.logger.Warningf("Retry %d/%d getting active templates failed: %v", i+1, maxRetries, err)
+		
+		if i < maxRetries-1 {
+			time.Sleep(time.Duration(i+1) * time.Second) // Exponential backoff
+		}
+	}
+	
+	return nil, lastErr
+}
+
+// sendPromoteToGroupWithRetry mengirim promosi dengan retry mechanism
+func (s *AutoPromoteService) sendPromoteToGroupWithRetry(groupJID string, templates []database.PromoteTemplate, maxRetries int) error {
+	var lastErr error
+	
+	for i := 0; i < maxRetries; i++ {
+		err := s.sendPromoteToGroup(groupJID, templates)
+		if err == nil {
+			return nil
+		}
+		
+		lastErr = err
+		s.logger.Warningf("Retry %d/%d sending promote to %s failed: %v", i+1, maxRetries, groupJID, err)
+		
+		if i < maxRetries-1 {
+			time.Sleep(time.Duration(i+1) * 2 * time.Second) // Longer backoff for network issues
+		}
+	}
+	
+	return lastErr
 }
 
 // Helper functions

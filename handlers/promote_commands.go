@@ -198,9 +198,10 @@ func (h *PromoteCommandHandler) HandleListTemplatesCommand(evt *events.Message) 
 ❌ Tidak ada template aktif yang tersedia
 
 💡 **Info:**
-• Admin dapat menambah template dengan .addtemplate
-• Template yang ada mungkin sedang dinonaktifkan
-• Hubungi admin untuk mengelola template`
+• Admin belum menambahkan template promosi
+• Gunakan .addtemplate untuk menambah template (admin only)
+• Contoh: .addtemplate "Promo Hari Ini" "diskon" "🔥 Diskon 50%!"
+• Gunakan .alltemplates untuk melihat semua template`
 	}
 
 	var result strings.Builder
@@ -208,22 +209,34 @@ func (h *PromoteCommandHandler) HandleListTemplatesCommand(evt *events.Message) 
 	result.WriteString(fmt.Sprintf("📊 **Total:** %d template aktif\n\n", len(templates)))
 
 	for i, template := range templates {
-		if i >= 10 { // Batasi tampilan maksimal 10 template
-			result.WriteString(fmt.Sprintf("... dan %d template lainnya\n", len(templates)-10))
+		if i >= 15 { // Batasi tampilan maksimal 15 template
+			result.WriteString(fmt.Sprintf("... dan %d template lainnya\n", len(templates)-15))
 			break
 		}
 
-		result.WriteString(fmt.Sprintf("**%d.** %s\n", i+1, template.Title))
+		result.WriteString(fmt.Sprintf("🆔 **ID: %d** - %s\n", template.ID, template.Title))
 		result.WriteString(fmt.Sprintf("📂 Kategori: %s\n", template.Category))
-		result.WriteString(fmt.Sprintf("📅 Dibuat: %s\n\n", template.CreatedAt.Format("2006-01-02")))
+		result.WriteString(fmt.Sprintf("📅 Dibuat: %s\n", template.CreatedAt.Format("2006-01-02")))
+		result.WriteString(fmt.Sprintf("✅ Status: %s\n\n", getTemplateStatusText(template.IsActive)))
 	}
 
 	result.WriteString("💡 **Commands:**\n")
 	result.WriteString("• .previewtemplate [ID] - Preview template\n")
+	result.WriteString("• .alltemplates - Lihat semua template (aktif & nonaktif)\n")
 	result.WriteString("• .addtemplate - Tambah template (admin)\n")
-	result.WriteString("• .edittemplate [ID] - Edit template (admin)")
+	result.WriteString("• .edittemplate [ID] - Edit template (admin)\n")
+	result.WriteString("• .deletetemplate [ID] - Hapus template (admin)\n\n")
+	result.WriteString("📋 **Contoh:** .previewtemplate 1 atau .deletetemplate 5")
 
 	return result.String()
+}
+
+// getTemplateStatusText helper function untuk status template
+func getTemplateStatusText(isActive bool) string {
+	if isActive {
+		return "Aktif ✅"
+	}
+	return "Tidak Aktif ❌"
 }
 
 // HandlePreviewTemplateCommand menangani command .previewtemplate [ID]
@@ -251,6 +264,183 @@ func (h *PromoteCommandHandler) HandlePreviewTemplateCommand(evt *events.Message
 	}
 
 	return preview
+}
+
+// HandleAllTemplatesCommand menangani command .alltemplates
+func (h *PromoteCommandHandler) HandleAllTemplatesCommand(evt *events.Message) string {
+	templates, err := h.templateService.GetAllTemplates()
+	if err != nil {
+		h.logger.Errorf("Failed to get all templates: %v", err)
+		return "❌ Gagal mendapatkan daftar template"
+	}
+
+	if len(templates) == 0 {
+		return `📝 *SEMUA TEMPLATE PROMOSI*
+
+❌ Database template masih kosong
+
+💡 **Cara Menambah Template (Admin Only):**
+• .addtemplate "Judul" "Kategori" "Konten"
+• Contoh: .addtemplate "Flash Sale" "diskon" "🔥 FLASH SALE! Diskon 70% hari ini! Order: 08123456789"
+
+📋 **Kategori yang Disarankan:**
+• produk, diskon, testimoni, flashsale, bundle, ongkir, cashback, limited, contact`
+	}
+
+	var result strings.Builder
+	result.WriteString("📝 *SEMUA TEMPLATE PROMOSI*\n\n")
+	result.WriteString(fmt.Sprintf("📊 **Total:** %d template\n\n", len(templates)))
+
+	activeCount := 0
+	inactiveCount := 0
+
+	for _, template := range templates {
+		if template.IsActive {
+			activeCount++
+		} else {
+			inactiveCount++
+		}
+
+		statusIcon := "✅"
+		if !template.IsActive {
+			statusIcon = "❌"
+		}
+
+		result.WriteString(fmt.Sprintf("%s **ID: %d** - %s\n", statusIcon, template.ID, template.Title))
+		result.WriteString(fmt.Sprintf("📂 Kategori: %s\n", template.Category))
+		result.WriteString(fmt.Sprintf("📅 Dibuat: %s\n", template.CreatedAt.Format("2006-01-02")))
+		result.WriteString(fmt.Sprintf("✅ Status: %s\n\n", getTemplateStatusText(template.IsActive)))
+	}
+
+	result.WriteString(fmt.Sprintf("📊 **Ringkasan:**\n"))
+	result.WriteString(fmt.Sprintf("• Aktif: %d template\n", activeCount))
+	result.WriteString(fmt.Sprintf("• Tidak Aktif: %d template\n\n", inactiveCount))
+
+	result.WriteString("💡 **Commands Admin:**\n")
+	result.WriteString("• .deletetemplate [ID] - Hapus template\n")
+	result.WriteString("• .edittemplate [ID] - Edit template\n")
+	result.WriteString("• .previewtemplate [ID] - Preview template")
+
+	return result.String()
+}
+
+// HandleHelpCommand menangani command .help
+func (h *PromoteCommandHandler) HandleHelpCommand(evt *events.Message) string {
+	return `📋 *BANTUAN AUTO PROMOTE SYSTEM*
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 *COMMANDS USER:*
+
+• *.promote*
+  Aktifkan auto promote di grup
+
+• *.disablepromote*
+  Nonaktifkan auto promote di grup
+
+• *.statuspromo*
+  Cek status auto promote grup
+
+• *.testpromo*
+  Test kirim promosi manual
+
+• *.listtemplates*
+  Lihat template aktif
+
+• *.alltemplates*
+  Lihat semua template (aktif & nonaktif)
+
+• *.previewtemplate [ID]*
+  Preview template berdasarkan ID
+  Contoh: .previewtemplate 5
+
+• *.help*
+  Bantuan ini
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+👑 *COMMANDS ADMIN:*
+
+📝 *Template Management:*
+• *.addtemplate "Judul" "Kategori" "Konten"*
+  Tambah template baru
+
+• *.edittemplate [ID] "Judul" "Kategori" "Konten"*
+  Edit template existing
+
+• *.deletetemplate [ID]*
+  Hapus template berdasarkan ID
+
+• *.deletemulti [ID1,ID2,ID3]*
+  Hapus multiple template
+  Contoh: .deletemulti 1,5,8,12
+
+• *.deleteall*
+  Hapus semua template
+
+📊 *API & Statistics:*
+• *.fetchproducts*
+  Ambil produk dari API (digroup per 15)
+
+• *.productstats*
+  Statistik produk dari API
+
+• *.templatestats*
+  Statistik template
+
+• *.promotestats*
+  Statistik auto promote
+
+• *.activegroups*
+  Lihat grup yang aktif auto promote
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *CARA PENGGUNAAN:*
+
+1️⃣ *Aktivasi Auto Promote:*
+   • Ketik .promote di grup
+   • Bot akan kirim promosi setiap 4 jam
+   • Template dipilih random
+
+2️⃣ *Management Template (Admin):*
+   • .fetchproducts untuk ambil dari API
+   • .addtemplate untuk tambah manual
+   • .listtemplates untuk lihat semua
+
+3️⃣ *Monitoring:*
+   • .statuspromo untuk cek status grup
+   • .activegroups untuk lihat semua grup aktif
+   • .templatestats untuk statistik
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+⚙️ *FITUR SISTEM:*
+
+🤖 *Auto Promote:*
+• Interval: 4 jam sekali
+• Random template selection
+• Per-group control
+• Anti-spam protection
+
+📝 *Template System:*
+• Support variables: {DATE}, {TIME}, dll
+• Kategori: produk, diskon, testimoni, dll
+• CRUD operations lengkap
+• API integration
+
+🛡️ *Admin Control:*
+• Permission-based commands
+• Bulk operations
+• Real-time statistics
+• Error handling
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+❓ *BUTUH BANTUAN?*
+Hubungi admin atau gunakan commands di atas
+
+🚀 *Happy Promoting!*`
 }
 
 // HandlePromoteHelpCommand menangani command .promotehelp
@@ -304,6 +494,7 @@ func (h *PromoteCommandHandler) IsPromoteCommand(messageText string) bool {
 		".statuspromo",
 		".testpromo",
 		".listtemplates",
+		".alltemplates",
 		".previewtemplate",
 		".promotehelp",
 		".addtemplate",
@@ -312,6 +503,11 @@ func (h *PromoteCommandHandler) IsPromoteCommand(messageText string) bool {
 		".templatestats",
 		".promotestats",
 		".activegroups",
+		".fetchproducts",
+		".productstats",
+		".deleteall",
+		".deletemulti",
+		".help",
 	}
 	
 	for _, cmd := range promoteCommands {
@@ -350,11 +546,17 @@ func (h *PromoteCommandHandler) HandlePromoteCommands(evt *events.Message, messa
 	case ".listtemplates":
 		return h.HandleListTemplatesCommand(evt)
 		
+	case ".alltemplates":
+		return h.HandleAllTemplatesCommand(evt)
+		
 	case ".previewtemplate":
 		return h.HandlePreviewTemplateCommand(evt, args)
 		
 	case ".promotehelp":
 		return h.HandlePromoteHelpCommand(evt)
+		
+	case ".help":
+		return h.HandleHelpCommand(evt)
 		
 	// Admin commands (akan diimplementasi di file terpisah)
 	case ".addtemplate", ".edittemplate", ".deletetemplate":

@@ -325,7 +325,7 @@ func (h *MessageHandler) handleAutoPromoteCommand(evt *events.Message, messageTe
 	lowerText := strings.ToLower(strings.TrimSpace(messageText))
 	
 	// Cek apakah ini admin command
-	adminCommands := []string{".addtemplate", ".edittemplate", ".deletetemplate", ".templatestats", ".promotestats", ".activegroups"}
+	adminCommands := []string{".addtemplate", ".edittemplate", ".deletetemplate", ".templatestats", ".promotestats", ".activegroups", ".fetchproducts", ".productstats", ".deleteall", ".deletemulti"}
 	for _, cmd := range adminCommands {
 		if strings.HasPrefix(lowerText, cmd) {
 			if h.adminCommandHandler != nil {
