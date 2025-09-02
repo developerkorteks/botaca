@@ -1,0 +1,60 @@
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Documentation
+README.md
+*.md
+docs/
+
+# Temporary files
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+bot
+*.exe
+
+# Database files (will be mounted as volumes)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# QR code files (will be mounted as volumes)
+*.png
+*.jpg
+*.jpeg
+
+# Node modules (if any)
+node_modules/
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Test files
+*_test.go
+test/
+tests/
+
+# Coverage
+coverage.out
+*.cover
+
+# Vendor (if using)
+vendor/

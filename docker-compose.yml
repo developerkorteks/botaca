@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  whatsapp-bot:
+    build: .
+    container_name: auto-promote-bot
+    restart: unless-stopped
+    volumes:
+      # Persist database files
+      - ./data:/app/data
+      # Persist session files
+      - ./session.db:/app/session.db
+      - ./promote.db:/app/promote.db
+      # Persist QR code
+      - ./qrcode.png:/app/qrcode.png
+    environment:
+      - TZ=Asia/Jakarta
+    networks:
+      - bot-network
+    # Optional: expose port for monitoring
+    ports:
+      - "8080:8080"
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  bot-network:
+    driver: bridge
+
+volumes:
+  bot-data:
+    driver: local
