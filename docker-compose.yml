@@ -6,13 +6,10 @@ services:
     container_name: auto-promote-bot
     restart: unless-stopped
     volumes:
-      # Persist database files
+      # Persist data directory for databases and files
       - ./data:/app/data
-      # Persist session files
-      - ./session.db:/app/session.db
-      - ./promote.db:/app/promote.db
-      # Persist QR code
-      - ./qrcode.png:/app/qrcode.png
+      # Mount current directory for database files (they will be created automatically)
+      - .:/app/host_data
     environment:
       - TZ=Asia/Jakarta
     networks:

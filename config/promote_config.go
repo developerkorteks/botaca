@@ -32,7 +32,7 @@ type PromoteConfig struct {
 func NewPromoteConfig() *PromoteConfig {
 	return &PromoteConfig{
 		// Database terpisah untuk auto promote
-		PromoteDatabasePath: getEnvOrDefault("PROMOTE_DB_PATH", "promote.db"),
+		PromoteDatabasePath: getEnvOrDefault("PROMOTE_DB_PATH", "data/promote.db"),
 
 		// Admin numbers dari environment variable (pisahkan dengan koma)
 		AdminNumbers: getAdminNumbers(),

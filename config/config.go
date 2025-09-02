@@ -29,14 +29,14 @@ type Config struct {
 // Fungsi ini akan dipanggil saat bot pertama kali dijalankan
 func NewConfig() *Config {
 	return &Config{
-		// Database akan disimpan di file session.db di folder saat ini
-		DatabasePath: getEnvOrDefault("DB_PATH", "session.db"),
+		// Database akan disimpan di folder data
+		DatabasePath: getEnvOrDefault("DB_PATH", "data/session.db"),
 		
 		// Log level default adalah INFO (tidak terlalu verbose)
 		LogLevel: getEnvOrDefault("LOG_LEVEL", "INFO"),
 		
-		// QR code akan disimpan sebagai qrcode.png
-		QRCodePath: getEnvOrDefault("QR_PATH", "qrcode.png"),
+		// QR code akan disimpan di folder data
+		QRCodePath: getEnvOrDefault("QR_PATH", "data/qrcode.png"),
 		
 		// Auto reply untuk chat personal diaktifkan
 		AutoReplyPersonal: getEnvBoolOrDefault("AUTO_REPLY_PERSONAL", true),
