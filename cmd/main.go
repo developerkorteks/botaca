@@ -12,7 +12,9 @@ import (
 	waLog "go.mau.fi/whatsmeow/util/log"
 	
 	"github.com/nabilulilalbab/promote/config"
+	"github.com/nabilulilalbab/promote/database"
 	"github.com/nabilulilalbab/promote/handlers"
+	"github.com/nabilulilalbab/promote/services"
 	"github.com/nabilulilalbab/promote/utils"
 	
 	_ "github.com/mattn/go-sqlite3" // SQLite driver
@@ -24,6 +26,7 @@ func main() {
 	// STEP 1: Load konfigurasi
 	// Konfigurasi berisi semua pengaturan bot seperti database path, auto reply, dll
 	cfg := config.NewConfig()
+	promoteCfg := config.NewPromoteConfig()
 	
 	// STEP 2: Setup logger
 	// Logger untuk menampilkan informasi dengan format yang rapi
@@ -58,17 +61,51 @@ func main() {
 	clientLog := waLog.Stdout("Client", cfg.LogLevel, true)
 	client := whatsmeow.NewClient(deviceStore, clientLog)
 	
-	// STEP 7: Setup handlers untuk menangani pesan dan event
+	// STEP 7: Setup Auto Promote System (jika diaktifkan)
+	var autoPromoteService *services.AutoPromoteService
+	var templateService *services.TemplateService
+	var promoteCommandHandler *handlers.PromoteCommandHandler
+	var adminCommandHandler *handlers.AdminCommandHandler
+	
+	if promoteCfg.EnableAutoPromote {
+		logger.Info("Initializing Auto Promote System...")
+		
+		// Setup database untuk auto promote
+		promoteDB, promoteRepo, err := database.InitializeDatabase(promoteCfg.PromoteDatabasePath)
+		if err != nil {
+			logger.Errorf("Failed to initialize promote database: %v", err)
+			os.Exit(1)
+		}
+		defer promoteDB.Close()
+		
+		// Setup services
+		templateService = services.NewTemplateService(promoteRepo, logger)
+		autoPromoteService = services.NewAutoPromoteService(client, promoteRepo, logger)
+		
+		// Setup command handlers
+		promoteCommandHandler = handlers.NewPromoteCommandHandler(autoPromoteService, templateService, logger)
+		adminCommandHandler = handlers.NewAdminCommandHandler(autoPromoteService, templateService, logger, promoteCfg.AdminNumbers)
+		
+		logger.Success("Auto Promote System initialized!")
+	}
+	
+	// STEP 8: Setup handlers untuk menangani pesan dan event
 	// Message handler menangani pesan masuk
 	messageHandler := handlers.NewMessageHandler(client, cfg.AutoReplyPersonal, cfg.AutoReplyGroup)
+	
+	// Set auto promote handlers jika tersedia
+	if promoteCommandHandler != nil && adminCommandHandler != nil {
+		messageHandler.SetAutoPromoteHandlers(promoteCommandHandler, adminCommandHandler)
+		logger.Info("Auto Promote handlers attached to message handler")
+	}
 	
 	// Event handler menangani semua event WhatsApp (koneksi, pesan, dll)
 	eventHandler := handlers.NewEventHandler(client, messageHandler)
 	
-	// STEP 8: Daftarkan event handler ke client
+	// STEP 9: Daftarkan event handler ke client
 	client.AddEventHandler(eventHandler.HandleEvent)
 	
-	// STEP 9: Connect ke WhatsApp
+	// STEP 10: Connect ke WhatsApp
 	if client.Store.ID == nil {
 		// Belum login, perlu scan QR code
 		logger.Warning("Belum login, memerlukan QR code...")
@@ -87,18 +124,41 @@ func main() {
 		}
 	}
 	
-	// STEP 10: Bot siap digunakan
+	// STEP 11: Start Auto Promote Scheduler (jika diaktifkan)
+	if autoPromoteService != nil {
+		logger.Info("Starting Auto Promote Scheduler...")
+		autoPromoteService.StartScheduler()
+		
+		// Log konfigurasi auto promote
+		logger.Infof("Auto Promote Config: %d admin(s), %d hour interval", 
+			len(promoteCfg.AdminNumbers), promoteCfg.AutoPromoteInterval)
+	}
+	
+	// STEP 12: Bot siap digunakan
 	logger.Success("Bot berhasil terhubung ke WhatsApp!")
 	logger.Info("Bot siap menerima pesan...")
+	
+	if promoteCfg.EnableAutoPromote {
+		logger.Success("🚀 Auto Promote System is READY!")
+		logger.Info("Commands: .promote, .disablepromote, .promotehelp")
+	}
+	
 	logger.Info("Tekan Ctrl+C untuk menghentikan bot")
 	
-	// STEP 11: Wait for interrupt signal (Ctrl+C)
+	// STEP 13: Wait for interrupt signal (Ctrl+C)
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	<-c
 	
-	// STEP 12: Graceful shutdown
+	// STEP 14: Graceful shutdown
 	logger.Info("Menghentikan bot...")
+	
+	// Stop auto promote scheduler jika berjalan
+	if autoPromoteService != nil {
+		logger.Info("Stopping Auto Promote Scheduler...")
+		autoPromoteService.StopScheduler()
+	}
+	
 	client.Disconnect()
 	logger.Success("Bot berhasil dihentikan. Sampai jumpa!")
 }

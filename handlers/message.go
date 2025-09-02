@@ -23,6 +23,10 @@ type MessageHandler struct {
 	
 	// autoReplyGroup menentukan apakah bot membalas chat grup
 	autoReplyGroup bool
+	
+	// Auto Promote handlers
+	promoteCommandHandler *PromoteCommandHandler
+	adminCommandHandler   *AdminCommandHandler
 }
 
 // NewMessageHandler membuat handler baru untuk pesan
@@ -36,6 +40,12 @@ func NewMessageHandler(client *whatsmeow.Client, autoReplyPersonal, autoReplyGro
 		autoReplyPersonal: autoReplyPersonal,
 		autoReplyGroup:    autoReplyGroup,
 	}
+}
+
+// SetAutoPromoteHandlers mengatur handlers untuk auto promote
+func (h *MessageHandler) SetAutoPromoteHandlers(promoteHandler *PromoteCommandHandler, adminHandler *AdminCommandHandler) {
+	h.promoteCommandHandler = promoteHandler
+	h.adminCommandHandler = adminHandler
 }
 
 // HandleMessage adalah fungsi utama untuk menangani pesan masuk
@@ -84,8 +94,8 @@ func (h *MessageHandler) HandleMessage(evt *events.Message) {
 func (h *MessageHandler) handlePersonalMessage(evt *events.Message, messageText string) {
 	fmt.Println("💬 Memproses pesan personal...")
 	
-	// Cek apakah ini adalah command (dimulai dengan /)
-	if strings.HasPrefix(messageText, "/") {
+	// Cek apakah ini adalah command (dimulai dengan / atau .)
+	if strings.HasPrefix(messageText, "/") || strings.HasPrefix(messageText, ".") {
 		h.handleCommand(evt, messageText)
 		return
 	}
@@ -108,8 +118,8 @@ func (h *MessageHandler) handleGroupMessage(evt *events.Message, messageText str
 	// Cek apakah bot di-mention dalam pesan
 	isMentioned := h.isBotMentioned(evt.Message)
 	
-	// Cek apakah ini adalah command
-	isCommand := strings.HasPrefix(messageText, "/")
+	// Cek apakah ini adalah command (/ atau .)
+	isCommand := strings.HasPrefix(messageText, "/") || strings.HasPrefix(messageText, ".")
 	
 	if isCommand {
 		// Selalu proses command di grup
@@ -131,29 +141,34 @@ func (h *MessageHandler) handleCommand(evt *events.Message, messageText string) 
 	
 	var response string
 	
-	// Daftar command yang tersedia
-	switch {
-	case lowerText == "/start":
-		response = "🤖 *WhatsApp Bot Aktif!*\n\n✨ Bot siap melayani Anda.\nKetik /help untuk melihat command yang tersedia."
-		
-	case lowerText == "/help":
-		response = h.getHelpMessage()
-		
-	case lowerText == "/ping":
-		response = "🏓 Pong! Bot aktif dan berjalan dengan baik."
-		
-	case lowerText == "/info":
-		response = h.getInfoMessage()
-		
-	case lowerText == "/status":
-		response = h.getStatusMessage()
-		
-	case strings.HasPrefix(lowerText, "/promote"):
-		// Command promote untuk grup (akan diimplementasi nanti)
-		response = "🔧 Fitur promote sedang dalam pengembangan."
-		
-	default:
-		response = "❓ Command tidak dikenal. Ketik /help untuk melihat command yang tersedia."
+	// Cek apakah ini auto promote command terlebih dahulu
+	if h.isAutoPromoteCommand(lowerText) {
+		response = h.handleAutoPromoteCommand(evt, messageText)
+	} else {
+		// Daftar command yang tersedia
+		switch {
+		case lowerText == "/start":
+			response = "🤖 *WhatsApp Bot Aktif!*\n\n✨ Bot siap melayani Anda.\nKetik /help untuk melihat command yang tersedia."
+			
+		case lowerText == "/help":
+			response = h.getHelpMessage()
+			
+		case lowerText == "/ping":
+			response = "🏓 Pong! Bot aktif dan berjalan dengan baik."
+			
+		case lowerText == "/info":
+			response = h.getInfoMessage()
+			
+		case lowerText == "/status":
+			response = h.getStatusMessage()
+			
+		case strings.HasPrefix(lowerText, "/promote"):
+			// Command promote untuk grup (akan diimplementasi nanti)
+			response = "🔧 Fitur promote sedang dalam pengembangan."
+			
+		default:
+			response = "❓ Command tidak dikenal. Ketik /help untuk melihat command yang tersedia."
+		}
 	}
 	
 	// Kirim response
@@ -295,4 +310,35 @@ func (h *MessageHandler) truncateString(s string, maxLen int) string {
 		return s
 	}
 	return s[:maxLen] + "..."
+}
+
+// isAutoPromoteCommand mengecek apakah pesan adalah command auto promote
+func (h *MessageHandler) isAutoPromoteCommand(messageText string) bool {
+	if h.promoteCommandHandler == nil {
+		return false
+	}
+	return h.promoteCommandHandler.IsPromoteCommand(messageText)
+}
+
+// handleAutoPromoteCommand menangani command auto promote
+func (h *MessageHandler) handleAutoPromoteCommand(evt *events.Message, messageText string) string {
+	lowerText := strings.ToLower(strings.TrimSpace(messageText))
+	
+	// Cek apakah ini admin command
+	adminCommands := []string{".addtemplate", ".edittemplate", ".deletetemplate", ".templatestats", ".promotestats", ".activegroups"}
+	for _, cmd := range adminCommands {
+		if strings.HasPrefix(lowerText, cmd) {
+			if h.adminCommandHandler != nil {
+				return h.adminCommandHandler.HandleAdminCommands(evt, messageText)
+			}
+			return "❌ Admin commands tidak tersedia"
+		}
+	}
+	
+	// Handle regular promote commands
+	if h.promoteCommandHandler != nil {
+		return h.promoteCommandHandler.HandlePromoteCommands(evt, messageText)
+	}
+	
+	return "❌ Auto promote commands tidak tersedia"
 }

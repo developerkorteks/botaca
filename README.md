@@ -1,4 +1,4 @@
-# 🤖 WhatsApp Bot dengan Whatsmeow
+# 🤖 WhatsApp Bot dengan Auto Promote System
 
 Bot WhatsApp yang dibuat dengan Go menggunakan library `whatsmeow`. Project ini dirancang dengan struktur yang rapi dan mudah dipelajari, lengkap dengan dokumentasi detail untuk setiap bagian kode.
 
