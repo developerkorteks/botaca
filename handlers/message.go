@@ -408,7 +408,7 @@ func (h *MessageHandler) handleAutoPromoteCommand(evt *events.Message, messageTe
 	// Cek apakah ini admin command
 	adminCommands := []string{
 		// Group Management Commands
-		".listgroups", ".enablegroup", ".disablegroup", ".groupstatus", ".testgroup",
+		".listgroups", ".enablegroup", ".enablemulti", ".disablegroup", ".groupstatus", ".testgroup",
 		// Template Management Commands
 		".addtemplate", ".edittemplate", ".deletetemplate", ".templatestats", ".promotestats", ".activegroups", ".fetchproducts", ".productstats", ".deleteall", ".deletemulti"}
 	for _, cmd := range adminCommands {

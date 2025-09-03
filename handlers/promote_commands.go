@@ -764,6 +764,7 @@ func (h *PromoteCommandHandler) IsPromoteCommand(messageText string) bool {
 		// Group Management Commands
 		".listgroups",
 		".enablegroup",
+		".enablemulti",
 		".disablegroup",
 		".groupstatus",
 		".testgroup",

@@ -1537,6 +1537,89 @@ func (h *AdminCommandHandler) HandleEnableGroupCommand(evt *events.Message, args
 		groupInfo.Name, groupInfo.ID, groupInfo.MemberCount, groupID, groupID, groupID)
 }
 
+// HandleEnableMultipleGroupsCommand menangani command .enablemulti [ID1,ID2,...]
+func (h *AdminCommandHandler) HandleEnableMultipleGroupsCommand(evt *events.Message, args []string) string {
+	if !h.isAdmin(evt.Info.Sender.User) {
+		return `❌ *AKSES DITOLAK*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *TIDAK ADA IZIN*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚫 Command ini hanya bisa digunakan oleh admin.`
+	}
+
+	if len(args) < 2 {
+		return `❌ *FORMAT SALAH*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *CARA PENGGUNAAN*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 *Format:* .enablemulti [ID1,ID2,ID3]
+📋 *Contoh:* .enablemulti 1,5,8
+💡 Gunakan .listgroups untuk melihat ID grup.`
+	}
+
+	if h.groupManagerService == nil {
+		return `❌ *SERVICE TIDAK TERSEDIA*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *KESALAHAN SISTEM*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚫 Service untuk manajemen grup tidak dikonfigurasi.`
+	}
+
+	idsStr := strings.Join(args[1:], "")
+	idStrings := strings.Split(idsStr, ",")
+
+	var successCount, failCount int
+	var successDetails, failDetails []string
+
+	for _, idStr := range idStrings {
+		id, err := strconv.Atoi(strings.TrimSpace(idStr))
+		if err != nil {
+			failCount++
+			failDetails = append(failDetails, fmt.Sprintf("ID '%s': bukan angka", idStr))
+			continue
+		}
+
+		err = h.groupManagerService.EnableAutoPromoteForGroup(id)
+		if err != nil {
+			failCount++
+			failDetails = append(failDetails, fmt.Sprintf("ID %d: %v", id, err))
+		} else {
+			successCount++
+			successDetails = append(successDetails, fmt.Sprintf("ID %d", id))
+		}
+	}
+
+	var result strings.Builder
+	result.WriteString("🚀 *HASIL AKTIVASI MULTIPLE GRUP*\n\n")
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+	result.WriteString("           *RINGKASAN OPERASI*\n")
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
+	result.WriteString(fmt.Sprintf("✅ *Berhasil Diaktifkan:* %d grup\n", successCount))
+	result.WriteString(fmt.Sprintf("❌ *Gagal Diaktifkan:* %d grup\n", failCount))
+
+	if len(successDetails) > 0 {
+		result.WriteString("\n*Grup yang berhasil diaktifkan:*\n")
+		result.WriteString(strings.Join(successDetails, ", "))
+	}
+
+	if len(failDetails) > 0 {
+		result.WriteString("\n\n*Detail Kegagalan:*\n")
+		for i, detail := range failDetails {
+			if i < 5 { // Batasi 5 error
+				result.WriteString(fmt.Sprintf("• %s\n", detail))
+			} else {
+				result.WriteString(fmt.Sprintf("... dan %d error lainnya.", len(failDetails)-5))
+				break
+			}
+		}
+	}
+
+	result.WriteString("\n\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+	result.WriteString("💡 Gunakan *.activegroups* untuk melihat semua grup yang aktif.")
+
+	return result.String()
+}
+
 // HandleDisableGroupCommand menangani command .disablegroup [ID]
 func (h *AdminCommandHandler) HandleDisableGroupCommand(evt *events.Message, args []string) string {
 	// Cek admin permission
@@ -2015,6 +2098,9 @@ func (h *AdminCommandHandler) HandleAdminCommands(evt *events.Message, messageTe
 
 	case ".enablegroup":
 		return h.HandleEnableGroupCommand(evt, args)
+
+	case ".enablemulti":
+		return h.HandleEnableMultipleGroupsCommand(evt, args)
 
 	case ".disablegroup":
 		return h.HandleDisableGroupCommand(evt, args)
