@@ -233,8 +233,6 @@ func (p *PromoteHandler) LoadPromoteTemplate(templateName string) (string, error
 	// Contoh implementasi untuk load template
 	// Anda bisa sesuaikan dengan struktur template di folder layout/
 	
-	templatePath := fmt.Sprintf("../layout/%s.txt", templateName)
-	
 	// Baca file template (implementasi sederhana)
 	// content, err := ioutil.ReadFile(templatePath)
 	// if err != nil {
@@ -284,7 +282,7 @@ func (p *PromoteHandler) SendPromoteNotification(groupJID types.JID, targetJID, 
 		ExtendedTextMessage: &waProto.ExtendedTextMessage{
 			Text: &message,
 			ContextInfo: &waProto.ContextInfo{
-				MentionedJid: []string{targetJID.String(), promoterJID.String()},
+				MentionedJID: []string{targetJID.String(), promoterJID.String()},
 			},
 		},
 	}

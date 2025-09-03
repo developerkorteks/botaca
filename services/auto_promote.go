@@ -28,6 +28,9 @@ type AutoPromoteService struct {
 
 // NewAutoPromoteService membuat service baru
 func NewAutoPromoteService(client *whatsmeow.Client, repo database.Repository, logger *utils.Logger) *AutoPromoteService {
+	// Inisialisasi random seed sekali saja
+	rand.Seed(time.Now().UnixNano())
+
 	service := &AutoPromoteService{
 		client:     client,
 		repository: repo,
@@ -284,9 +287,6 @@ func (s *AutoPromoteService) selectRandomTemplate(templates []database.PromoteTe
 		// Return empty template jika tidak ada
 		return database.PromoteTemplate{}
 	}
-	
-	// Seed random generator
-	rand.Seed(time.Now().UnixNano())
 	
 	// Pilih index random
 	index := rand.Intn(len(templates))
