@@ -212,14 +212,31 @@ func (s *APIProductService) fetchProductsFromAPI() ([]Product, error) {
 func (s *APIProductService) generateGroupedProductTemplate(products []Product, groupNum int) string {
 	var template strings.Builder
 
-	template.WriteString(fmt.Sprintf(`🛒 *PAKET DATA GROUP %d*
+	template.WriteString(fmt.Sprintf(`🔥 *VPN PREMIUM CATALOG* 🔥
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-          *PROMO TERBATAS!*
-        _Stok menipis, buruan!_
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+🌐 *VPN SERVICES*
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
-📋 *DAFTAR PAKET TERSEDIA*
+🚀 *PROTOCOLS:*
+• Trojan GRPC/WS • VMess GRPC/WS
+• VLess GRPC/WS • SSH WebSocket
+• Multipath • Wildcard
+
+🌍 *SERVERS:*
+🇮🇩 ID: wa.me/6285150588080
+🇸🇬 SG: t.me/grnstoreofficial_bot
+
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+🛒 *PAKET DATA GROUP %d*
+
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+⚡ *PROMO TERBATAS!*
+_Stok menipis, buruan order!_
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+📋 *DAFTAR PAKET:*
 
 `, groupNum))
 
@@ -240,33 +257,51 @@ func (s *APIProductService) generateGroupedProductTemplate(products []Product, g
 	// Tambahkan informasi singkat dan contact
 	template.WriteString(`
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
-✅ *Paket RESMI* = GARANSI PENUH 
-⚠️ *Paket DOR* = TANPA GARANSI
-💰 *Harga tertera* = Harga/Jasa DOR
+✅ *RESMI* = GARANSI PENUH 
+⚠️ *DOR* = TANPA GARANSI
+💰 *Harga* = Harga/Jasa DOR
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-           *ORDER SEKARANG*
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+🔥 *VPN PREMIUM FEATURES*
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
-🤖 *BOT OTOMATIS*
-📱 *WhatsApp:* wa.me/6287786388052
-🤖 *Telegram:* t.me/grnstoreofficial_bot
+🌐 *VPN FEATURES:*
+• ⚡ High Speed • 🔒 Military Encryption
+• 🌍 Multi Server • 📱 All Device
+• 🛡️ No Log • 🔄 24/7 Reconnect
 
-👨‍💼 *ADMIN MANUAL*
-📱 *Admin 1:* wa.me/6285150588080
-📱 *Admin 2:* wa.me/6285117557905
+🚀 *ADVANCED PROTOCOLS:*
+• Trojan-GRPC (Ultra Fast)
+• VMess-WS (Stable) 
+• VLess-GRPC (Low Latency)
+• SSH-WS (Bypass DPI)
+• Multipath Custom • Wildcard
 
-👥 *JOIN GROUP*
-🔗 *Group Chat:* chat.whatsapp.com/IeIXOndIoFr0apnlKzghUC
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+📞 *ORDER CENTER*
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🇮🇩 *VPN ID:* wa.me/6285150588080
+🇸🇬 *VPN SG:* t.me/grnstoreofficial_bot
 
-🟢 *JAM BUKA:* 01:00 - 23:00 WIB
+🛒 *PAKET DATA:*
+📱 wa.me/6287786388052
+🤖 t.me/grnstoreofficial_bot
+
+👨‍💼 *ADMIN:*
+📱 wa.me/6285150588080
+📱 wa.me/6285117557905
+
+👥 *GROUP:* chat.whatsapp.com/IeIXOndIoFr0apnlKzghUC
+
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+🟢 *BUKA:* 01:00 - 23:00 WIB
 ⏰ *BURUAN ORDER!* Stok terbatas!
 
-#PaketData #GRNStore #OrderSekarang`)
+#PaketData #VPNPremium #GRNStore`)
 
 	return template.String()
 }
@@ -279,28 +314,51 @@ func (s *APIProductService) generateProductTemplate(product Product) string {
 		description = description[:200] + "..."
 	}
 
-	template := fmt.Sprintf(`📱 *%s*
+	template := fmt.Sprintf(`🔥 *VPN PREMIUM CATALOG* 🔥
 
-💰 **Harga:** %s
-📝 **Detail:** %s
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+🌐 *VPN SERVICES*
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
-🎯 **Order Sekarang:**
+🚀 *PROTOCOLS:*
+• Trojan GRPC/WS • VMess GRPC/WS
+• VLess GRPC/WS • SSH WebSocket
+• Multipath • Wildcard
 
-🤖 **BOT OTOMATIS:**
-📱 WhatsApp: wa.me/6287786388052
-🤖 Telegram: https://t.me/grnstoreofficial_bot
+🌍 *SERVERS:*
+🇮🇩 ID: wa.me/6285150588080
+🇸🇬 SG: t.me/grnstoreofficial_bot
 
-👨‍💼 **ADMIN MANUAL:**
-📱 Admin 1: wa.me/6285150588080
-📱 Admin 2: wa.me/6285117557905
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
-👥 **JOIN GROUP:**
-🔗 https://chat.whatsapp.com/IeIXOndIoFr0apnlKzghUC
+📱 *%s*
+
+💰 *Harga:* %s
+📝 *Detail:* %s
+
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+📞 *ORDER CENTER*
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+
+🇮🇩 *VPN ID:* wa.me/6285150588080
+🇸🇬 *VPN SG:* t.me/grnstoreofficial_bot
+
+🛒 *PAKET DATA:*
+📱 wa.me/6287786388052
+🤖 t.me/grnstoreofficial_bot
+
+👨‍💼 *ADMIN:*
+📱 wa.me/6285150588080
+📱 wa.me/6285117557905
+
+👥 *GROUP:* chat.whatsapp.com/IeIXOndIoFr0apnlKzghUC
+
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
 ⚡ *Stok terbatas, buruan order!*
 🔥 *Jangan sampai nyesal kemudian!*
 
-#PaketData #GRNStore #OrderSekarang #%s`,
+#PaketData #VPNPremium #GRNStore #%s`,
 		product.PackageNameShort,
 		product.PackageHarga,
 		description,
