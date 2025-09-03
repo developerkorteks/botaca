@@ -23,6 +23,7 @@ type AutoPromoteService struct {
 	logger     *utils.Logger
 	scheduler  *SchedulerService
 	isRunning  bool
+	interval   time.Duration // Interval auto promote dalam durasi
 }
 
 // NewAutoPromoteService membuat service baru
@@ -32,12 +33,19 @@ func NewAutoPromoteService(client *whatsmeow.Client, repo database.Repository, l
 		repository: repo,
 		logger:     logger,
 		isRunning:  false,
+		interval:   4 * time.Hour, // Default 4 jam
 	}
 	
 	// Inisialisasi scheduler
 	service.scheduler = NewSchedulerService(service.processScheduledPromotes, logger)
 	
 	return service
+}
+
+// SetInterval mengatur interval auto promote
+func (s *AutoPromoteService) SetInterval(hours int) {
+	s.interval = time.Duration(hours) * time.Hour
+	s.logger.Infof("Auto promote interval set to %d hours", hours)
 }
 
 // StartAutoPromote mengaktifkan auto promote untuk grup tertentu
@@ -125,9 +133,10 @@ func (s *AutoPromoteService) StartScheduler() {
 	}
 	
 	s.logger.Info("Starting auto promote scheduler...")
-	s.scheduler.Start(4 * time.Hour) // Setiap 4 jam
+	s.logger.Infof("Scheduler will run every %v", s.interval)
+	s.scheduler.Start(s.interval)
 	s.isRunning = true
-	s.logger.Success("Auto promote scheduler started!")
+	s.logger.Successf("Auto promote scheduler started with %v interval!", s.interval)
 }
 
 // StopScheduler menghentikan scheduler
@@ -228,9 +237,9 @@ func (s *AutoPromoteService) shouldSkipGroup(group *database.AutoPromoteGroup) b
 		return false
 	}
 	
-	// Cek apakah sudah 4 jam sejak promosi terakhir
-	fourHoursAgo := time.Now().Add(-4 * time.Hour)
-	return group.LastPromoteAt.After(fourHoursAgo)
+	// Cek apakah sudah mencapai interval yang ditentukan sejak promosi terakhir
+	intervalAgo := time.Now().Add(-s.interval)
+	return group.LastPromoteAt.After(intervalAgo)
 }
 
 // sendPromoteToGroup mengirim promosi ke grup tertentu

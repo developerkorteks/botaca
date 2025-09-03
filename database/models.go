@@ -54,15 +54,25 @@ var DefaultPromoteTemplates = []PromoteTemplate{
 	{
 		Title:    "Produk Unggulan",
 		Category: "produk",
-		Content: `🔥 *PRODUK UNGGULAN HARI INI* 🔥
+		Content: `🌟 *PRODUK UNGGULAN HARI INI* 🌟
 
-✨ Dapatkan produk terbaik dengan kualitas premium!
-💎 Harga terjangkau, kualitas terjamin
-🚀 Stok terbatas, jangan sampai kehabisan!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📱 *Order sekarang:*
-💬 WhatsApp: 08123456789
-🛒 Link: bit.ly/produk-unggulan
+✨ *Kualitas Premium* | 💎 *Harga Terjangkau*
+🚀 *Stok Terbatas* | ⚡ *Pengiriman Cepat*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛒 *ORDER SEKARANG JUGA!*
+
+📱 *WhatsApp:* wa.me/6208123456789
+🌐 *Website:* bit.ly/produk-unggulan
+💳 *Pembayaran:* Transfer/COD/E-Wallet
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏰ *Jangan sampai kehabisan!*
+🎁 *Bonus untuk 50 pembeli pertama*
 
 #ProdukUnggulan #KualitasPremium #OrderSekarang`,
 		IsActive: true,
@@ -72,13 +82,30 @@ var DefaultPromoteTemplates = []PromoteTemplate{
 		Category: "diskon",
 		Content: `🎉 *PROMO SPESIAL HARI INI* 🎉
 
-💥 DISKON hingga 50% untuk semua produk!
-⏰ Promo terbatas hanya sampai {DATE}
-🎁 Bonus gratis untuk pembelian minimal 100k
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🛍️ *Jangan lewatkan kesempatan emas ini!*
-📞 Order: 08123456789
-💳 Pembayaran mudah & aman
+💥 *DISKON HINGGA 50%* 💥
+🎯 *Semua Produk* | ⏰ *Terbatas Waktu*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎁 *BONUS SPESIAL:*
+• Gratis ongkir min. 100k
+• Cashback 10% untuk member
+• Voucher belanja berikutnya
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛒 *BURUAN ORDER!*
+
+📱 *WhatsApp:* wa.me/6208123456789
+💳 *Pembayaran:* Transfer/COD/E-Wallet/QRIS
+⏰ *Berakhir:* {DATE} 23:59 WIB
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔥 *Jangan sampai menyesal!*
+✨ *Kesempatan emas ini terbatas!*
 
 #PromoSpesial #Diskon50Persen #TerbatasWaktu`,
 		IsActive: true,
@@ -88,17 +115,35 @@ var DefaultPromoteTemplates = []PromoteTemplate{
 		Category: "testimoni",
 		Content: `⭐ *TESTIMONI CUSTOMER SETIA* ⭐
 
-💬 "Produknya bagus banget, sesuai ekspektasi!"
-👤 - Bu Sarah, Jakarta
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-💬 "Pelayanan ramah, pengiriman cepat!"
-👤 - Pak Budi, Surabaya
+💬 *"Produknya bagus banget, sesuai ekspektasi!"*
+👤 Bu Sarah, Jakarta
+⭐⭐⭐⭐⭐
 
-💬 "Harga murah, kualitas juara!"
-👤 - Mbak Siti, Bandung
+💬 *"Pelayanan ramah, pengiriman cepat!"*
+👤 Pak Budi, Surabaya  
+⭐⭐⭐⭐⭐
 
-🙏 Terima kasih kepercayaannya!
-📱 Order: 08123456789
+💬 *"Harga murah, kualitas juara!"*
+👤 Mbak Siti, Bandung
+⭐⭐⭐⭐⭐
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏆 *RATING 4.9/5* dari 1000+ customer
+🎯 *99% Customer Puas* dengan pelayanan kami
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛒 *BERGABUNGLAH DENGAN MEREKA!*
+
+📱 *Order Sekarang:* wa.me/6208123456789
+🌟 *Dapatkan Pengalaman Terbaik!*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🙏 *Terima kasih atas kepercayaan Anda!*
 
 #TestimoniCustomer #KepuasanPelanggan #Terpercaya`,
 		IsActive: true,
@@ -108,17 +153,30 @@ var DefaultPromoteTemplates = []PromoteTemplate{
 		Category: "flashsale",
 		Content: `⚡ *FLASH SALE ALERT!* ⚡
 
-🔥 HANYA 2 JAM LAGI!
-💰 Harga super murah, stok terbatas!
-⏰ Berakhir pukul 23:59 WIB
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🎯 *Yang tersisa:*
-• Produk A: 5 pcs tersisa
-• Produk B: 3 pcs tersisa
-• Produk C: 8 pcs tersisa
+🔥 *HANYA 2 JAM LAGI!* 🔥
+💰 *Harga Super Murah* | 🏃‍♂️ *Stok Terbatas*
 
-💨 BURUAN ORDER SEBELUM KEHABISAN!
-📱 WhatsApp: 08123456789
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 *STOK TERSISA:*
+🟢 Produk A: *5 pcs* tersisa
+🟡 Produk B: *3 pcs* tersisa  
+🟢 Produk C: *8 pcs* tersisa
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚡ *ORDER SEKARANG!*
+
+📱 *WhatsApp:* wa.me/6208123456789
+⏰ *Berakhir:* 23:59 WIB
+🚀 *Checkout Cepat:* bit.ly/flashsale-now
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💨 *BURUAN! SEBELUM KEHABISAN!*
+🎯 *First come, first served!*
 
 #FlashSale #StokTerbatas #BuruanOrder`,
 		IsActive: true,
@@ -168,18 +226,34 @@ var DefaultPromoteTemplates = []PromoteTemplate{
 		Category: "ongkir",
 		Content: `🚚 *GRATIS ONGKIR SELURUH INDONESIA!* 🚚
 
-🎉 Tanpa minimum pembelian!
-📦 Pengiriman aman & terpercaya
-⏰ Estimasi 1-3 hari kerja
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🌟 *Keuntungan lainnya:*
-• Packing aman & rapi
-• Asuransi pengiriman
-• Tracking number real-time
-• Customer service 24/7
+🎉 *TANPA MINIMUM PEMBELIAN!*
+📦 *Pengiriman Aman & Terpercaya*
+⏰ *Estimasi 1-3 Hari Kerja*
 
-🛒 Order sekarang juga!
-📱 WhatsApp: 08123456789
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌟 *KEUNTUNGAN EKSKLUSIF:*
+
+📦 *Packing Aman & Rapi*
+🛡️ *Asuransi Pengiriman*
+📍 *Tracking Real-Time*
+🤝 *Customer Service 24/7*
+🚀 *Ekspedisi Terpercaya*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🛒 *ORDER SEKARANG JUGA!*
+
+📱 *WhatsApp:* wa.me/6208123456789
+🌐 *Website:* bit.ly/free-ongkir
+📱 *Cek Ongkir:* bit.ly/cek-ongkir
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 *Hemat lebih banyak dengan gratis ongkir!*
+✨ *Belanja makin untung!*
 
 #GratisOngkir #PengirimanAman #OrderSekarang`,
 		IsActive: true,
@@ -230,20 +304,35 @@ var DefaultPromoteTemplates = []PromoteTemplate{
 		Category: "contact",
 		Content: `📞 *HUBUNGI KAMI UNTUK ORDER!* 📞
 
-🛒 *Cara Order:*
-1️⃣ WhatsApp: 08123456789
-2️⃣ Telegram: @tokoonline
-3️⃣ Instagram: @toko.online
-4️⃣ Website: www.tokoonline.com
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-💳 *Pembayaran:*
-• Transfer Bank (BCA, Mandiri, BRI)
-• E-wallet (OVO, DANA, GoPay)
-• COD (area tertentu)
+🛒 *CARA ORDER:*
 
-⏰ *Jam Operasional:*
-Senin-Sabtu: 08:00-22:00 WIB
-Minggu: 10:00-20:00 WIB
+📱 *WhatsApp:* wa.me/6208123456789
+📲 *Telegram:* t.me/tokoonline
+📸 *Instagram:* instagram.com/toko.online
+🌐 *Website:* www.tokoonline.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💳 *METODE PEMBAYARAN:*
+
+🏦 *Transfer Bank:* BCA, Mandiri, BRI
+💰 *E-Wallet:* OVO, DANA, GoPay, ShopeePay
+📱 *QRIS:* Scan & Pay
+🚚 *COD:* Area Jabodetabek
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏰ *JAM OPERASIONAL:*
+
+🗓️ *Senin-Sabtu:* 08:00-22:00 WIB
+🗓️ *Minggu:* 10:00-20:00 WIB
+🤖 *Auto Reply:* 24/7
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ *Siap melayani Anda dengan sepenuh hati!*
 
 #ContactInfo #CaraOrder #JamOperasional`,
 		IsActive: true,

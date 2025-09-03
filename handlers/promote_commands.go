@@ -37,63 +37,200 @@ func NewPromoteCommandHandler(
 func (h *PromoteCommandHandler) HandleAcaCommand(evt *events.Message) string {
 	// Hanya bisa digunakan di grup
 	if evt.Info.Chat.Server != types.GroupServer {
-		return "❌ Command .aca hanya bisa digunakan di grup!"
+		return `❌ *COMMAND TIDAK VALID*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *HANYA UNTUK GRUP*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Command .aca hanya bisa digunakan di grup
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *INFORMASI*
+• Command ini khusus untuk grup WhatsApp
+• Tidak bisa digunakan di chat personal
+• Gunakan /help untuk command umum
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 *Coba gunakan di grup yang sesuai*`
 	}
 
 	groupJID := evt.Info.Chat.String()
-	
+
 	// Aktifkan auto promote
 	err := h.autoPromoteService.StartAutoPromote(groupJID)
 	if err != nil {
 		h.logger.Errorf("Failed to start auto promote for %s: %v", groupJID, err)
-		return fmt.Sprintf("❌ Gagal mengaktifkan auto promote: %s", err.Error())
+		return fmt.Sprintf(`❌ *GAGAL MENGAKTIFKAN AUTO PROMOTE*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *TERJADI KESALAHAN*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Gagal mengaktifkan auto promote: %s
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *KEMUNGKINAN PENYEBAB*
+• Masalah koneksi database
+• Template promosi belum tersedia
+• Grup sudah aktif sebelumnya
+• Masalah konfigurasi sistem
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 *Coba lagi atau hubungi admin*`, err.Error())
 	}
 
-	return `Hehe~ panggil aku terus ya, onii-chan~ 💕`
+	return `✅ *AUTO PROMOTE DIAKTIFKAN!*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *BERHASIL AKTIF*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 Auto promote telah diaktifkan untuk grup ini
+⏰ Bot akan mengirim promosi sesuai interval
+🎲 Template akan dipilih secara random
+📊 Status dapat dipantau dengan .statuspromo
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 *Sistem auto promote siap bekerja!*`
 }
 
 // HandleDisableAcaCommand menangani command .disableaca (dulu .disablepromote)
 func (h *PromoteCommandHandler) HandleDisableAcaCommand(evt *events.Message) string {
 	// Hanya bisa digunakan di grup
 	if evt.Info.Chat.Server != types.GroupServer {
-		return "❌ Command .disableaca hanya bisa digunakan di grup!"
+		return `❌ *COMMAND TIDAK VALID*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *HANYA UNTUK GRUP*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Command .disableaca hanya bisa digunakan di grup
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *INFORMASI*
+• Command ini khusus untuk grup WhatsApp
+• Tidak bisa digunakan di chat personal
+• Gunakan /help untuk command umum
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 *Coba gunakan di grup yang sesuai*`
 	}
 
 	groupJID := evt.Info.Chat.String()
-	
+
 	// Nonaktifkan auto promote
 	err := h.autoPromoteService.StopAutoPromote(groupJID)
 	if err != nil {
 		h.logger.Errorf("Failed to stop auto promote for %s: %v", groupJID, err)
-		return fmt.Sprintf("❌ Gagal menonaktifkan auto promote: %s", err.Error())
+		return fmt.Sprintf(`❌ *GAGAL MENONAKTIFKAN AUTO PROMOTE*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *TERJADI KESALAHAN*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Gagal menonaktifkan auto promote: %s
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *KEMUNGKINAN PENYEBAB*
+• Masalah koneksi database
+• Auto promote sudah tidak aktif
+• Grup tidak terdaftar di sistem
+• Masalah konfigurasi sistem
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 *Coba lagi atau hubungi admin*`, err.Error())
 	}
 
-	return `Hyaa! Baka onii-chan, jangan ganggu aku >///<`
+	return `🛑 *AUTO PROMOTE DINONAKTIFKAN!*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *BERHASIL DINONAKTIFKAN*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 Auto promote telah dinonaktifkan untuk grup ini
+⏰ Bot tidak akan mengirim promosi lagi
+📊 Data grup tetap tersimpan di sistem
+🔄 Dapat diaktifkan kembali kapan saja
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ *Auto promote berhasil dihentikan!*`
 }
 
 // HandleStatusPromoCommand menangani command .statuspromo
 func (h *PromoteCommandHandler) HandleStatusPromoCommand(evt *events.Message) string {
 	// Hanya bisa digunakan di grup
 	if evt.Info.Chat.Server != types.GroupServer {
-		return "❌ Command .statuspromo hanya bisa digunakan di grup!"
+		return `❌ *COMMAND TIDAK VALID*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *HANYA UNTUK GRUP*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Command .statuspromo hanya bisa digunakan di grup
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *INFORMASI*
+• Command ini khusus untuk grup WhatsApp
+• Tidak bisa digunakan di chat personal
+• Gunakan /help untuk command umum
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 *Coba gunakan di grup yang sesuai*`
 	}
 
 	groupJID := evt.Info.Chat.String()
-	
+
 	// Ambil status grup
 	group, err := h.autoPromoteService.GetGroupStatus(groupJID)
 	if err != nil {
 		h.logger.Errorf("Failed to get group status for %s: %v", groupJID, err)
-		return "❌ Gagal mendapatkan status grup"
+		return `❌ *GAGAL MENDAPATKAN STATUS GRUP*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *TERJADI KESALAHAN*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Gagal mendapatkan status grup
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *KEMUNGKINAN PENYEBAB*
+• Masalah koneksi database
+• Grup belum terdaftar di sistem
+• Masalah konfigurasi sistem
+• Error internal server
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 *Coba lagi atau hubungi admin*`
 	}
 
 	if group == nil {
 		return `📊 *STATUS AUTO PROMOTE*
 
-❌ **Status:** Tidak terdaftar
-💡 **Info:** Grup ini belum pernah menggunakan auto promote
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            *TIDAK TERDAFTAR*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🚀 Gunakan .promote untuk mengaktifkan auto promote`
+❌ *Status:* Tidak terdaftar
+💡 *Info:* Grup ini belum pernah menggunakan auto promote
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 *Gunakan .promote untuk mengaktifkan auto promote*`
 	}
 
 	// Format status
@@ -122,44 +259,99 @@ func (h *PromoteCommandHandler) HandleStatusPromoCommand(evt *events.Message) st
 
 	return fmt.Sprintf(`📊 *STATUS AUTO PROMOTE*
 
-🎯 **Status:** %s
-📅 **Dimulai:** %s
-⏰ **Promosi Terakhir:** %s
-📝 **Template Tersedia:** %d template
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *STATUS GRUP INI*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-💡 **Commands:**
-• .promote - Aktifkan auto promote
-• .disablepromote - Nonaktifkan auto promote
-• .testpromo - Test kirim promosi
-• .listtemplates - Lihat template`, status, startedInfo, lastPromoteInfo, templateCount)
+🎯 *Status:* %s
+📅 *Dimulai:* %s
+⏰ *Promosi Terakhir:* %s
+📝 *Template Tersedia:* %d template
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *COMMANDS TERSEDIA*
+• *.promote* - Aktifkan auto promote
+• *.disablepromote* - Nonaktifkan auto promote
+• *.testpromo* - Test kirim promosi
+• *.listtemplates* - Lihat template
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 *Status diperbarui real-time*`, status, startedInfo, lastPromoteInfo, templateCount)
 }
 
 // HandleTestPromoCommand menangani command .testpromo
 func (h *PromoteCommandHandler) HandleTestPromoCommand(evt *events.Message) string {
 	// Hanya bisa digunakan di grup
 	if evt.Info.Chat.Server != types.GroupServer {
-		return "❌ Command .testpromo hanya bisa digunakan di grup!"
+		return `❌ *COMMAND TIDAK VALID*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *HANYA UNTUK GRUP*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Command .testpromo hanya bisa digunakan di grup
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *INFORMASI*
+• Command ini khusus untuk grup WhatsApp
+• Tidak bisa digunakan di chat personal
+• Gunakan /help untuk command umum
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 *Coba gunakan di grup yang sesuai*`
 	}
 
 	groupJID := evt.Info.Chat.String()
-	
+
 	// Kirim promosi manual
 	err := h.autoPromoteService.SendManualPromote(groupJID)
 	if err != nil {
 		h.logger.Errorf("Failed to send manual promote for %s: %v", groupJID, err)
-		return fmt.Sprintf("❌ Gagal mengirim test promosi: %s", err.Error())
+		return fmt.Sprintf(`❌ *GAGAL MENGIRIM TEST PROMOSI*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *TERJADI KESALAHAN*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Gagal mengirim test promosi: %s
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *KEMUNGKINAN PENYEBAB*
+• Template promosi tidak tersedia
+• Masalah koneksi WhatsApp
+• Grup tidak terdaftar di sistem
+• Bot tidak memiliki izin kirim pesan
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 *Coba lagi atau hubungi admin*`, err.Error())
 	}
 
-	return `🧪 *TEST PROMOSI BERHASIL!*
+	return `🚀 *PROMOSI BERHASIL DIKIRIM!*
 
-✅ Promosi test telah dikirim ke grup ini
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          *BERHASIL TERKIRIM*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Promosi telah dikirim ke grup ini
 🎲 Template dipilih secara random
-📝 Ini adalah contoh bagaimana auto promote bekerja
+📝 Contoh bagaimana auto promote bekerja
 
-💡 **Info:**
-• Test ini tidak mempengaruhi jadwal auto promote
-• Auto promote tetap berjalan sesuai interval 4 jam
-• Gunakan .statuspromo untuk cek status`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *INFORMASI*
+• Tidak mempengaruhi jadwal auto promote
+• Auto promote tetap berjalan sesuai interval
+• Gunakan *.statuspromo* untuk cek status
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 *Cek hasil promosi di grup!*`
 }
 
 // HandleListTemplatesCommand menangani command .listtemplates
@@ -167,45 +359,84 @@ func (h *PromoteCommandHandler) HandleListTemplatesCommand(evt *events.Message) 
 	templates, err := h.templateService.GetActiveTemplates()
 	if err != nil {
 		h.logger.Errorf("Failed to get templates: %v", err)
-		return "❌ Gagal mendapatkan daftar template"
+		return `❌ *GAGAL MENDAPATKAN TEMPLATE*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+		         *TERJADI KESALAHAN*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Gagal mendapatkan daftar template aktif.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *KEMUNGKINAN PENYEBAB*
+• Masalah koneksi database.
+• Service template tidak tersedia.
+• Error internal sistem.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 *Coba lagi atau hubungi admin*`
 	}
 
 	if len(templates) == 0 {
 		return `📝 *DAFTAR TEMPLATE PROMOSI*
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            *TIDAK ADA TEMPLATE*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 ❌ Tidak ada template aktif yang tersedia
 
-💡 **Info:**
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *INFORMASI*
 • Admin belum menambahkan template promosi
-• Gunakan .addtemplate untuk menambah template (admin only)
-• Contoh: .addtemplate "Promo Hari Ini" "diskon" "🔥 Diskon 50%!"
-• Gunakan .alltemplates untuk melihat semua template
-• Gunakan .aca untuk mengaktifkan auto promote`
+• Gunakan *.addtemplate* untuk menambah template
+• Contoh: *.addtemplate* "Promo Hari Ini" "diskon" "🔥 Diskon 50%!"
+• Gunakan *.alltemplates* untuk melihat semua template
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 *Hubungi admin untuk menambah template*`
 	}
 
 	var result strings.Builder
 	result.WriteString("📝 *DAFTAR TEMPLATE PROMOSI*\n\n")
-	result.WriteString(fmt.Sprintf("📊 **Total:** %d template aktif\n\n", len(templates)))
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+	result.WriteString(fmt.Sprintf("        *TOTAL: %d TEMPLATE AKTIF*\n", len(templates)))
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
 
 	for i, template := range templates {
 		if i >= 15 { // Batasi tampilan maksimal 15 template
-			result.WriteString(fmt.Sprintf("... dan %d template lainnya\n", len(templates)-15))
+			result.WriteString(fmt.Sprintf("... dan %d template lainnya\n\n", len(templates)-15))
 			break
 		}
 
-		result.WriteString(fmt.Sprintf("🆔 **ID: %d** - %s\n", template.ID, template.Title))
-		result.WriteString(fmt.Sprintf("📂 Kategori: %s\n", template.Category))
-		result.WriteString(fmt.Sprintf("📅 Dibuat: %s\n", template.CreatedAt.Format("2006-01-02")))
-		result.WriteString(fmt.Sprintf("✅ Status: %s\n\n", getTemplateStatusText(template.IsActive)))
+		result.WriteString(fmt.Sprintf("🆔 *ID: %d* - %s\n", template.ID, template.Title))
+		result.WriteString(fmt.Sprintf("📂 *Kategori:* %s\n", template.Category))
+		result.WriteString(fmt.Sprintf("📅 *Dibuat:* %s\n", template.CreatedAt.Format("2006-01-02")))
+		result.WriteString(fmt.Sprintf("✅ *Status:* %s\n", getTemplateStatusText(template.IsActive)))
+
+		if i < len(templates)-1 && i < 14 {
+			result.WriteString("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
+		}
 	}
 
-	result.WriteString("💡 **Commands:**\n")
-	result.WriteString("• .previewtemplate [ID] - Preview template\n")
-	result.WriteString("• .alltemplates - Lihat semua template (aktif & nonaktif)\n")
-	result.WriteString("• .addtemplate - Tambah template (admin)\n")
-	result.WriteString("• .edittemplate [ID] - Edit template (admin)\n")
-	result.WriteString("• .deletetemplate [ID] - Hapus template (admin)\n\n")
-	result.WriteString("📋 **Contoh:** .previewtemplate 1 atau .deletetemplate 5")
+	result.WriteString("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+	result.WriteString("            *COMMANDS*\n")
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
+	result.WriteString("• *.previewtemplate [ID]*\n")
+	result.WriteString("  _Preview template_\n\n")
+	result.WriteString("• *.alltemplates*\n")
+	result.WriteString("  _Lihat semua template_\n\n")
+	result.WriteString("• *.addtemplate* (admin)\n")
+	result.WriteString("  _Tambah template_\n\n")
+	result.WriteString("• *.edittemplate [ID]* (admin)\n")
+	result.WriteString("  _Edit template_\n\n")
+	result.WriteString("• *.deletetemplate [ID]* (admin)\n")
+	result.WriteString("  _Hapus template_\n\n")
+	result.WriteString("💡 *Contoh:* .previewtemplate 1 atau .deletetemplate 5")
 
 	return result.String()
 }
@@ -232,14 +463,47 @@ func (h *PromoteCommandHandler) HandlePreviewTemplateCommand(evt *events.Message
 	// Parse ID template
 	templateID, err := strconv.Atoi(args[1])
 	if err != nil {
-		return "❌ ID template harus berupa angka"
+		return `❌ *ID TIDAK VALID*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+		         *FORMAT ID SALAH*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 ID template harus berupa angka.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *CONTOH PENGGUNAAN*
+• .previewtemplate 1
+• .previewtemplate 5
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 *Gunakan .listtemplates untuk melihat ID*`
 	}
 
 	// Preview template
 	preview, err := h.templateService.PreviewTemplate(templateID)
 	if err != nil {
 		h.logger.Errorf("Failed to preview template %d: %v", templateID, err)
-		return fmt.Sprintf("❌ Gagal preview template: %s", err.Error())
+		return fmt.Sprintf(`❌ *GAGAL PREVIEW TEMPLATE*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+		         *TERJADI KESALAHAN*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Gagal mendapatkan preview template: %s
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *KEMUNGKINAN PENYEBAB*
+• Template dengan ID tersebut tidak ditemukan.
+• Masalah koneksi database.
+• Error internal sistem.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 *Periksa ID atau hubungi admin*`, err.Error())
 	}
 
 	return preview
@@ -250,30 +514,62 @@ func (h *PromoteCommandHandler) HandleAllTemplatesCommand(evt *events.Message) s
 	templates, err := h.templateService.GetAllTemplates()
 	if err != nil {
 		h.logger.Errorf("Failed to get all templates: %v", err)
-		return "❌ Gagal mendapatkan daftar template"
+		return `❌ *GAGAL MENDAPATKAN TEMPLATE*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+		         *TERJADI KESALAHAN*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Gagal mendapatkan semua template.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *KEMUNGKINAN PENYEBAB*
+• Masalah koneksi database.
+• Service template tidak tersedia.
+• Error internal sistem.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 *Coba lagi atau hubungi admin*`
 	}
 
 	if len(templates) == 0 {
 		return `📝 *SEMUA TEMPLATE PROMOSI*
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            *DATABASE KOSONG*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 ❌ Database template masih kosong
 
-💡 **Cara Menambah Template (Admin Only):**
-• .addtemplate "Judul" "Kategori" "Konten"
-• Contoh: .addtemplate "Flash Sale" "diskon" "🔥 FLASH SALE! Diskon 70% hari ini! Order: 08123456789"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📋 **Kategori yang Disarankan:**
-• produk, diskon, testimoni, flashsale, bundle, ongkir, cashback, limited, contact`
+💡 *CARA MENAMBAH TEMPLATE (ADMIN)*
+• *.addtemplate* "Judul" "Kategori" "Konten"
+• Contoh: *.addtemplate* "Flash Sale" "diskon" "🔥 FLASH SALE! Diskon 70%!"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📋 *KATEGORI YANG DISARANKAN*
+• produk, diskon, testimoni, flashsale
+• bundle, ongkir, cashback, limited, contact
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 *Hubungi admin untuk menambah template*`
 	}
 
 	var result strings.Builder
 	result.WriteString("📝 *SEMUA TEMPLATE PROMOSI*\n\n")
-	result.WriteString(fmt.Sprintf("📊 **Total:** %d template\n\n", len(templates)))
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+	result.WriteString(fmt.Sprintf("        *TOTAL: %d TEMPLATE*\n", len(templates)))
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
 
 	activeCount := 0
 	inactiveCount := 0
 
-	for _, template := range templates {
+	for i, template := range templates {
 		if template.IsActive {
 			activeCount++
 		} else {
@@ -285,141 +581,138 @@ func (h *PromoteCommandHandler) HandleAllTemplatesCommand(evt *events.Message) s
 			statusIcon = "❌"
 		}
 
-		result.WriteString(fmt.Sprintf("%s **ID: %d** - %s\n", statusIcon, template.ID, template.Title))
-		result.WriteString(fmt.Sprintf("📂 Kategori: %s\n", template.Category))
-		result.WriteString(fmt.Sprintf("📅 Dibuat: %s\n", template.CreatedAt.Format("2006-01-02")))
-		result.WriteString(fmt.Sprintf("✅ Status: %s\n\n", getTemplateStatusText(template.IsActive)))
+		result.WriteString(fmt.Sprintf("%s *ID: %d* - %s\n", statusIcon, template.ID, template.Title))
+		result.WriteString(fmt.Sprintf("📂 *Kategori:* %s\n", template.Category))
+		result.WriteString(fmt.Sprintf("📅 *Dibuat:* %s\n", template.CreatedAt.Format("2006-01-02")))
+		result.WriteString(fmt.Sprintf("✅ *Status:* %s\n", getTemplateStatusText(template.IsActive)))
+
+		if i < len(templates)-1 {
+			result.WriteString("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
+		}
 	}
 
-	result.WriteString(fmt.Sprintf("📊 **Ringkasan:**\n"))
-	result.WriteString(fmt.Sprintf("• Aktif: %d template\n", activeCount))
-	result.WriteString(fmt.Sprintf("• Tidak Aktif: %d template\n\n", inactiveCount))
+	result.WriteString("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+	result.WriteString("            *RINGKASAN*\n")
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
+	result.WriteString(fmt.Sprintf("✅ *Aktif:* %d template\n", activeCount))
+	result.WriteString(fmt.Sprintf("❌ *Tidak Aktif:* %d template\n", inactiveCount))
 
-	result.WriteString("💡 **Commands Admin:**\n")
-	result.WriteString("• .deletetemplate [ID] - Hapus template\n")
-	result.WriteString("• .edittemplate [ID] - Edit template\n")
-	result.WriteString("• .previewtemplate [ID] - Preview template")
+	result.WriteString("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+	result.WriteString("            *COMMANDS ADMIN*\n")
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
+	result.WriteString("• *.deletetemplate [ID]* - Hapus template\n")
+	result.WriteString("• *.edittemplate [ID]* - Edit template\n")
+	result.WriteString("• *.previewtemplate [ID]* - Preview template")
 
 	return result.String()
 }
 
 // HandleHelpCommand menangani command .help
 func (h *PromoteCommandHandler) HandleHelpCommand(evt *events.Message) string {
-	return `📋 *BANTUAN AUTO PROMOTE SYSTEM*
+	return `🤖 *PANDUAN AUTO PROMOTE SYSTEM*
 
-━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          *ADMIN COMMANDS*
+        _(Personal Chat Only)_
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🎯 *COMMANDS USER:*
+🏠 *GROUP MANAGEMENT*
 
-• *.aca*
-  Aktifkan auto promote di grup
+• *.listgroups*
+  _Lihat semua grup yang diikuti_
 
-• *.disableaca*
-  Nonaktifkan auto promote di grup
+• *.enablegroup* [ID]
+  _Aktifkan auto promote grup_
+  Contoh: .enablegroup 3
 
-• *.statuspromo*
-  Cek status auto promote grup
+• *.disablegroup* [ID]
+  _Nonaktifkan auto promote grup_
+  Contoh: .disablegroup 3
 
-• *.testpromo*
-  Test kirim promosi manual
+• *.groupstatus* [ID]
+  _Status detail grup_
+  Contoh: .groupstatus 3
+
+• *.testgroup* [ID]
+  _Kirim promosi ke grup_
+  Contoh: .testgroup 3
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 *TEMPLATE MANAGEMENT*
 
 • *.listtemplates*
-  Lihat template aktif
+  _Lihat template aktif_
 
 • *.alltemplates*
-  Lihat semua template (aktif & nonaktif)
+  _Lihat semua template_
 
-• *.previewtemplate [ID]*
-  Preview template berdasarkan ID
+• *.previewtemplate* [ID]
+  _Preview template_
   Contoh: .previewtemplate 5
 
 • *.help*
-  Bantuan ini
+  _Bantuan lengkap_
 
-━━━━━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-👑 *COMMANDS ADMIN:*
+⚙️ *ADVANCED COMMANDS*
 
-📝 *Template Management:*
-• *.addtemplate "Judul" "Kategori" "Konten"*
-  Tambah template baru
+• *.addtemplate* "Judul" "Kategori"
+  _Tambah template baru_
 
-• *.edittemplate [ID] "Judul" "Kategori" "Konten"*
-  Edit template existing
+• *.edittemplate* [ID] "Judul"
+  _Edit template existing_
 
-• *.deletetemplate [ID]*
-  Hapus template berdasarkan ID
-
-• *.deletemulti [ID1,ID2,ID3]*
-  Hapus multiple template
-  Contoh: .deletemulti 1,5,8,12
+• *.deletetemplate* [ID]
+  _Hapus template_
 
 • *.deleteall*
-  Hapus semua template
+  _Hapus semua template_
 
-📊 *API & Statistics:*
-• *.fetchproducts*
-  Ambil produk dari API (digroup per 15)
-
-• *.productstats*
-  Statistik produk dari API
+• *.deletemulti* [ID1,ID2,ID3]
+  _Hapus multiple template_
 
 • *.templatestats*
-  Statistik template
+  _Statistik template_
 
 • *.promotestats*
-  Statistik auto promote
+  _Statistik auto promote_
 
 • *.activegroups*
-  Lihat grup yang aktif auto promote
+  _Grup aktif auto promote_
 
-━━━━━━━━━━━━━━━━━━━━━━
+• *.fetchproducts*
+  _Ambil produk dari API_
 
-💡 *CARA PENGGUNAAN:*
+• *.productstats*
+  _Statistik produk API_
 
-1️⃣ *Aktivasi Auto Promote:*
-   • Ketik .aca di grup
-   • Bot akan kirim promosi setiap 4 jam
-   • Template dipilih random
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-2️⃣ *Management Template (Admin):*
-   • .fetchproducts untuk ambil dari API
-   • .addtemplate untuk tambah manual
-   • .listtemplates untuk lihat semua
+📖 *QUICK START GUIDE*
 
-3️⃣ *Monitoring:*
-   • .statuspromo untuk cek status grup
-   • .activegroups untuk lihat semua grup aktif
-   • .templatestats untuk statistik
+1️⃣ Ketik: *.listgroups*
+   _Lihat semua grup_
 
-━━━━━━━━━━━━━━━━━━━━━━
+2️⃣ Ketik: *.enablegroup 1*
+   _Aktifkan auto promote_
 
-⚙️ *FITUR SISTEM:*
+3️⃣ Ketik: *.testgroup 1*
+   _Test kirim promosi_
 
-🤖 *Auto Promote:*
-• Interval: 4 jam sekali
-• Random template selection
-• Per-group control
-• Anti-spam protection
+4️⃣ Ketik: *.groupstatus 1*
+   _Monitor status grup_
 
-📝 *Template System:*
-• Support variables: {DATE}, {TIME}, dll
-• Kategori: produk, diskon, testimoni, dll
-• CRUD operations lengkap
-• API integration
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🛡️ *Admin Control:*
-• Permission-based commands
-• Bulk operations
-• Real-time statistics
-• Error handling
+⚠️ *PENTING*
+• Bot *TIDAK* merespon di grup
+• Semua kontrol via *personal chat*
+• Hanya *admin* yang bisa menggunakan
+• Mulai dengan *.listgroups*
 
-━━━━━━━━━━━━━━━━━━━━━━
-
-❓ *BUTUH BANTUAN?*
-Hubungi admin atau gunakan commands di atas
-
-🚀 *Happy Promoting!*`
+🚀 *Selamat Mempromosikan!*`
 }
 
 // HandlePromoteHelpCommand menangani command .promotehelp
@@ -427,7 +720,7 @@ func (h *PromoteCommandHandler) HandlePromoteHelpCommand(evt *events.Message) st
 	return `📋 *BANTUAN AUTO PROMOTE*
 
 🤖 **Fitur Auto Promote:**
-Sistem otomatis untuk mengirim promosi bisnis setiap 4 jam
+Sistem otomatis untuk mengirim promosi bisnis sesuai interval yang dikonfigurasi
 
 🎯 **Commands Utama:**
 • .promote - Aktifkan auto promote di grup
@@ -449,7 +742,7 @@ Sistem otomatis untuk mengirim promosi bisnis setiap 4 jam
 
 💡 **Cara Kerja:**
 1. Aktifkan dengan .promote di grup
-2. Bot akan kirim promosi setiap 4 jam
+2. Bot akan kirim promosi sesuai interval yang dikonfigurasi
 3. Template dipilih random dari yang tersedia
 4. Nonaktifkan kapan saja dengan .disablepromote
 
@@ -466,18 +759,21 @@ Hubungi admin atau gunakan command di atas`
 // IsPromoteCommand mengecek apakah pesan adalah command auto promote
 func (h *PromoteCommandHandler) IsPromoteCommand(messageText string) bool {
 	lowerText := strings.ToLower(strings.TrimSpace(messageText))
-	
+
 	promoteCommands := []string{
-		".aca",
-		".disableaca", 
-		".statuspromo",
-		".testpromo",
+		// Group Management Commands
+		".listgroups",
+		".enablegroup",
+		".disablegroup",
+		".groupstatus",
+		".testgroup",
+		// Template Commands
 		".listtemplates",
 		".alltemplates",
 		".previewtemplate",
-		".promotehelp",
+		// Admin Commands
 		".addtemplate",
-		".edittemplate", 
+		".edittemplate",
 		".deletetemplate",
 		".templatestats",
 		".promotestats",
@@ -488,13 +784,13 @@ func (h *PromoteCommandHandler) IsPromoteCommand(messageText string) bool {
 		".deletemulti",
 		".help",
 	}
-	
+
 	for _, cmd := range promoteCommands {
 		if strings.HasPrefix(lowerText, cmd) {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
@@ -502,48 +798,26 @@ func (h *PromoteCommandHandler) IsPromoteCommand(messageText string) bool {
 func (h *PromoteCommandHandler) HandlePromoteCommands(evt *events.Message, messageText string) string {
 	lowerText := strings.ToLower(strings.TrimSpace(messageText))
 	args := strings.Fields(lowerText)
-	
+
 	if len(args) == 0 {
 		return ""
 	}
-	
+
 	command := args[0]
-	
+
 	switch command {
-	case ".aca":
-		return h.HandleAcaCommand(evt)
-		
-	case ".disableaca":
-		return h.HandleDisableAcaCommand(evt)
-		
-	case ".statuspromo":
-		return h.HandleStatusPromoCommand(evt)
-		
-	case ".testpromo":
-		return h.HandleTestPromoCommand(evt)
-		
 	case ".listtemplates":
 		return h.HandleListTemplatesCommand(evt)
-		
+
 	case ".alltemplates":
 		return h.HandleAllTemplatesCommand(evt)
-		
+
 	case ".previewtemplate":
 		return h.HandlePreviewTemplateCommand(evt, args)
-		
-	case ".promotehelp":
-		return h.HandlePromoteHelpCommand(evt)
-		
+
 	case ".help":
 		return h.HandleHelpCommand(evt)
-		
-	// Admin commands (akan diimplementasi di file terpisah)
-	case ".addtemplate", ".edittemplate", ".deletetemplate":
-		return "🔧 Command admin template sedang dalam pengembangan"
-		
-	case ".templatestats", ".promotestats", ".activegroups":
-		return "📊 Command statistik sedang dalam pengembangan"
-		
+
 	default:
 		return ""
 	}

@@ -8,22 +8,22 @@ import (
 	"strings"
 
 	"go.mau.fi/whatsmeow"
+	waProto "go.mau.fi/whatsmeow/binary/proto"
 	"go.mau.fi/whatsmeow/types"
 	"go.mau.fi/whatsmeow/types/events"
-	waProto "go.mau.fi/whatsmeow/binary/proto"
 )
 
 // MessageHandler adalah struktur yang menangani semua pesan masuk
 type MessageHandler struct {
 	// client adalah instance WhatsApp client untuk mengirim pesan
 	client *whatsmeow.Client
-	
+
 	// autoReplyPersonal menentukan apakah bot membalas chat personal
 	autoReplyPersonal bool
-	
+
 	// autoReplyGroup menentukan apakah bot membalas chat grup
 	autoReplyGroup bool
-	
+
 	// Auto Promote handlers
 	promoteCommandHandler *PromoteCommandHandler
 	adminCommandHandler   *AdminCommandHandler
@@ -76,7 +76,7 @@ func (h *MessageHandler) HandleMessage(evt *events.Message) {
 	sender := evt.Info.Sender.User // Nomor pengirim (tanpa @s.whatsapp.net)
 	fmt.Printf("📨 Pesan masuk [%s]: %s\n", chatType, messageText)
 	fmt.Printf("👤 Dari: %s\n", sender)
-	
+
 	// Jika grup, tampilkan nama grup juga
 	if isGroup {
 		fmt.Printf("👥 Grup: %s\n", evt.Info.Chat.User)
@@ -93,13 +93,13 @@ func (h *MessageHandler) HandleMessage(evt *events.Message) {
 // handlePersonalMessage menangani pesan dari chat personal (1 on 1)
 func (h *MessageHandler) handlePersonalMessage(evt *events.Message, messageText string) {
 	fmt.Println("💬 Memproses pesan personal...")
-	
+
 	// Cek apakah ini adalah command (dimulai dengan / atau .)
 	if strings.HasPrefix(messageText, "/") || strings.HasPrefix(messageText, ".") {
 		h.handleCommand(evt, messageText)
 		return
 	}
-	
+
 	// Jika bukan command dan auto reply personal diaktifkan
 	if h.autoReplyPersonal {
 		h.sendAutoReply(evt.Info.Chat, messageText, false)
@@ -109,38 +109,26 @@ func (h *MessageHandler) handlePersonalMessage(evt *events.Message, messageText 
 // handleGroupMessage menangani pesan dari grup
 func (h *MessageHandler) handleGroupMessage(evt *events.Message, messageText string) {
 	fmt.Println("👥 Memproses pesan grup...")
-	
-	// PENTING: Untuk grup, kita hanya merespon jika:
-	// 1. Pesan adalah command (dimulai dengan /)
-	// 2. Bot di-mention (@bot)
-	// 3. Auto reply grup diaktifkan (tidak direkomendasikan)
-	
-	// Cek apakah bot di-mention dalam pesan
-	isMentioned := h.isBotMentioned(evt.Message)
-	
-	// Cek apakah ini adalah command (/ atau .)
-	isCommand := strings.HasPrefix(messageText, "/") || strings.HasPrefix(messageText, ".")
-	
-	if isCommand {
-		// Selalu proses command di grup
-		h.handleCommand(evt, messageText)
-	} else if isMentioned {
-		// Jika bot di-mention, balas meskipun auto reply grup dimatikan
-		h.sendAutoReply(evt.Info.Chat, messageText, true)
-	} else if h.autoReplyGroup {
-		// Hanya auto reply jika diaktifkan (HATI-HATI: bisa spam!)
-		h.sendAutoReply(evt.Info.Chat, messageText, true)
-	}
-	// Jika tidak ada kondisi di atas yang terpenuhi, bot tidak akan membalas
+
+	// BOT DIAM TOTAL DI GRUP - TIDAK ADA RESPONSE APAPUN
+	// Bot hanya akan mengirim auto promote sesuai scheduler
+	// Semua kontrol dilakukan melalui chat personal dengan admin
+
+	// Log untuk monitoring (tanpa response)
+	fmt.Printf("👥 Grup: %s | Pesan: %s | Action: IGNORED\n",
+		evt.Info.Chat.User, h.truncateString(messageText, 30))
+
+	// Bot tidak memberikan response apapun di grup
+	return
 }
 
 // handleCommand menangani command yang dimulai dengan /
 func (h *MessageHandler) handleCommand(evt *events.Message, messageText string) {
 	// Ubah ke lowercase untuk case-insensitive commands
 	lowerText := strings.ToLower(strings.TrimSpace(messageText))
-	
+
 	var response string
-	
+
 	// Cek apakah ini auto promote command terlebih dahulu
 	if h.isAutoPromoteCommand(lowerText) {
 		response = h.handleAutoPromoteCommand(evt, messageText)
@@ -148,29 +136,83 @@ func (h *MessageHandler) handleCommand(evt *events.Message, messageText string) 
 		// Daftar command yang tersedia
 		switch {
 		case lowerText == "/start":
-			response = "🤖 *WhatsApp Bot Aktif!*\n\n✨ Bot siap melayani Anda.\nKetik /help untuk melihat command yang tersedia."
-			
+			response = `🤖 *BOT AKTIF*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+			        *SELAMAT DATANG*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ Halo! Saya adalah bot WhatsApp yang siap membantu Anda.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *COMMANDS*
+• Ketik */help* untuk melihat daftar command.
+• Ketik */info* untuk detail tentang bot ini.
+• Ketik */status* untuk cek status sistem.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 *Siap melayani!*`
+
 		case lowerText == "/help":
 			response = h.getHelpMessage()
-			
+
 		case lowerText == "/ping":
-			response = "🏓 Pong! Bot aktif dan berjalan dengan baik."
-			
+			response = `🏓 *PONG!*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+			        *KONEKSI STABIL*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Bot aktif dan merespon dengan baik.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+• *Status:* Online
+• *Layanan:* Berjalan normal
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
+
 		case lowerText == "/info":
 			response = h.getInfoMessage()
-			
+
 		case lowerText == "/status":
 			response = h.getStatusMessage()
-			
+
 		case strings.HasPrefix(lowerText, "/promote"):
 			// Command promote untuk grup (akan diimplementasi nanti)
-			response = "🔧 Fitur promote sedang dalam pengembangan."
-			
+			response = `🔧 *FITUR DALAM PENGEMBANGAN*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+			        *SEGERA HADIR*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Fitur promote sedang dalam tahap pengembangan.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *Nantikan update selanjutnya!*`
+
 		default:
-			response = "❓ Command tidak dikenal. Ketik /help untuk melihat command yang tersedia."
+			response = `❓ *COMMAND TIDAK DIKENAL*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+			        *PERINTAH SALAH*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Command yang Anda masukkan tidak valid.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *BANTUAN*
+• Ketik */help* untuk melihat daftar command.
+• Pastikan penulisan command sudah benar.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
 		}
 	}
-	
+
 	// Kirim response
 	h.sendMessage(evt.Info.Chat, response)
 }
@@ -178,23 +220,23 @@ func (h *MessageHandler) handleCommand(evt *events.Message, messageText string) 
 // sendAutoReply mengirim balasan otomatis
 func (h *MessageHandler) sendAutoReply(chatJID types.JID, originalMessage string, isGroup bool) {
 	var response string
-	
+
 	if isGroup {
 		// Response untuk grup lebih formal dan tidak terlalu sering
-		response = "👋 Terima kasih! Saya adalah bot otomatis. Ketik /help untuk bantuan."
+		response = `👋 *AUTO-REPLY*
+
+Terima kasih! Saya adalah bot otomatis.
+Ketik */help* untuk bantuan.`
 	} else {
 		// Response untuk personal bisa lebih personal
-		responses := []string{
-			"✅ Terima kasih atas pesannya! Ketik /help untuk melihat command yang tersedia.",
-			"🤖 Pesan diterima! Saya adalah bot otomatis yang siap membantu.",
-			"👍 Got it! Kirim /help untuk melihat apa yang bisa saya lakukan.",
-		}
-		
-		// Pilih response berdasarkan panjang pesan untuk variasi
-		responseIndex := len(originalMessage) % len(responses)
-		response = responses[responseIndex]
+		response = `👋 *AUTO-REPLY*
+
+✅ Terima kasih atas pesannya!
+Saya adalah bot otomatis yang siap membantu.
+
+Ketik */help* untuk melihat command yang tersedia.`
 	}
-	
+
 	h.sendMessage(chatJID, response)
 }
 
@@ -204,12 +246,12 @@ func (h *MessageHandler) getMessageText(msg *waProto.Message) string {
 	if msg.GetConversation() != "" {
 		return msg.GetConversation()
 	}
-	
+
 	// Pesan teks dengan format (bold, italic, dll) atau reply
 	if msg.GetExtendedTextMessage() != nil {
 		return msg.GetExtendedTextMessage().GetText()
 	}
-	
+
 	// Jika bukan teks, return empty string
 	return ""
 }
@@ -220,7 +262,7 @@ func (h *MessageHandler) isBotMentioned(msg *waProto.Message) bool {
 	if msg.GetExtendedTextMessage() != nil && msg.GetExtendedTextMessage().GetContextInfo() != nil {
 		mentions := msg.GetExtendedTextMessage().GetContextInfo().GetMentionedJid()
 		botJID := h.client.Store.ID.String()
-		
+
 		// Cek apakah JID bot ada dalam daftar mention
 		for _, mention := range mentions {
 			if mention == botJID {
@@ -228,7 +270,7 @@ func (h *MessageHandler) isBotMentioned(msg *waProto.Message) bool {
 			}
 		}
 	}
-	
+
 	return false
 }
 
@@ -238,14 +280,14 @@ func (h *MessageHandler) sendMessage(chatJID types.JID, text string) {
 	msg := &waProto.Message{
 		Conversation: &text,
 	}
-	
+
 	// Kirim pesan menggunakan client
 	_, err := h.client.SendMessage(context.Background(), chatJID, msg)
 	if err != nil {
 		fmt.Printf("❌ Gagal mengirim pesan: %v\n", err)
 		return
 	}
-	
+
 	// Log pesan yang terkirim
 	fmt.Printf("✅ Pesan terkirim: %s\n", h.truncateString(text, 50))
 }
@@ -253,52 +295,91 @@ func (h *MessageHandler) sendMessage(chatJID types.JID, text string) {
 // Helper functions untuk pesan informatif
 
 func (h *MessageHandler) getHelpMessage() string {
-	return `📋 *Bantuan WhatsApp Bot*
+	return `📋 *BANTUAN WHATSAPP BOT*
 
-🤖 *Command yang tersedia:*
-• /start - Mulai bot
-• /help - Bantuan ini
-• /ping - Test koneksi bot
-• /info - Informasi tentang bot
-• /status - Status bot saat ini
-• /promote - Promote member grup (coming soon)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          *COMMAND TERSEDIA*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-💡 *Tips:*
-• Di chat personal: Bot akan membalas semua pesan
-• Di grup: Bot hanya merespon command atau mention
-• Ketik command tanpa parameter untuk info lebih lanjut
+🤖 *BASIC COMMANDS*
 
-📞 *Support:* Hubungi admin jika ada masalah`
+• */start*
+  _Mulai bot_
+
+• */help*
+  _Bantuan lengkap_
+
+• */ping*
+  _Test koneksi bot_
+
+• */info*
+  _Informasi tentang bot_
+
+• */status*
+  _Status bot saat ini_
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *TIPS PENGGUNAAN*
+
+• *Chat Personal:* Bot membalas semua pesan
+• *Di Grup:* Bot hanya respon command/mention
+• *Command:* Ketik tanpa parameter untuk info
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📞 *SUPPORT:* Hubungi admin jika ada masalah`
 }
 
 func (h *MessageHandler) getInfoMessage() string {
-	return `ℹ️ *Informasi Bot*
+	return `ℹ️ *INFORMASI BOT*
 
-🤖 Nama: WhatsApp Bot
-📝 Bahasa: Go (Golang)
-📚 Library: whatsmeow + go-qrcode
-✨ Versi: 1.0.0
-🎯 Fitur: Visual QR code, Auto-reply, Commands
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *DETAIL SISTEM*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🔧 *Konfigurasi Saat Ini:*
-• Auto Reply Personal: Aktif
-• Auto Reply Group: Tidak aktif (recommended)
-• Session: Tersimpan otomatis
+🤖 *SPESIFIKASI*
+📝 *Nama:* WhatsApp Bot
+💻 *Bahasa:* Go (Golang)
+📚 *Library:* whatsmeow + go-qrcode
+✨ *Versi:* 1.0.0
+🎯 *Fitur:* Visual QR, Auto-reply, Commands
 
-Bot ini dibuat untuk pembelajaran dan automasi WhatsApp.`
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 *KONFIGURASI AKTIF*
+• *Auto Reply Personal:* Aktif
+• *Auto Reply Group:* Tidak aktif
+• *Session:* Tersimpan otomatis
+• *QR Code:* Visual display
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 Bot ini dibuat untuk pembelajaran dan automasi WhatsApp`
 }
 
 func (h *MessageHandler) getStatusMessage() string {
-	return fmt.Sprintf(`📊 *Status Bot*
+	return fmt.Sprintf(`📊 *STATUS BOT*
 
-✅ Status: Online dan aktif
-🔗 Koneksi: Terhubung ke WhatsApp
-💾 Session: Tersimpan di database
-🤖 Bot ID: %s
-📱 Auto Reply Personal: %v
-👥 Auto Reply Group: %v
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *SISTEM STATUS*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🟢 Semua sistem berjalan normal!`, 
+🔋 *STATUS UTAMA*
+✅ *Status:* Online dan aktif
+🔗 *Koneksi:* Terhubung ke WhatsApp
+💾 *Session:* Tersimpan di database
+🤖 *Bot ID:* %s
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚙️ *KONFIGURASI*
+📱 *Auto Reply Personal:* %v
+👥 *Auto Reply Group:* %v
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🟢 *Semua sistem berjalan normal!*`,
 		h.client.Store.ID.User,
 		h.autoReplyPersonal,
 		h.autoReplyGroup)
@@ -323,22 +404,77 @@ func (h *MessageHandler) isAutoPromoteCommand(messageText string) bool {
 // handleAutoPromoteCommand menangani command auto promote
 func (h *MessageHandler) handleAutoPromoteCommand(evt *events.Message, messageText string) string {
 	lowerText := strings.ToLower(strings.TrimSpace(messageText))
-	
+
 	// Cek apakah ini admin command
-	adminCommands := []string{".addtemplate", ".edittemplate", ".deletetemplate", ".templatestats", ".promotestats", ".activegroups", ".fetchproducts", ".productstats", ".deleteall", ".deletemulti"}
+	adminCommands := []string{
+		// Group Management Commands
+		".listgroups", ".enablegroup", ".disablegroup", ".groupstatus", ".testgroup",
+		// Template Management Commands
+		".addtemplate", ".edittemplate", ".deletetemplate", ".templatestats", ".promotestats", ".activegroups", ".fetchproducts", ".productstats", ".deleteall", ".deletemulti"}
 	for _, cmd := range adminCommands {
 		if strings.HasPrefix(lowerText, cmd) {
 			if h.adminCommandHandler != nil {
 				return h.adminCommandHandler.HandleAdminCommands(evt, messageText)
 			}
-			return "❌ Admin commands tidak tersedia"
+			return `❌ *AKSES DITOLAK*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+			        *TIDAK ADA IZIN*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Command ini hanya bisa digunakan oleh admin.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *INFORMASI*
+• Hanya admin yang memiliki akses.
+• Hubungi admin untuk bantuan.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔒 *Akses terbatas untuk keamanan sistem*`
 		}
 	}
-	
-	// Handle regular promote commands
-	if h.promoteCommandHandler != nil {
-		return h.promoteCommandHandler.HandlePromoteCommands(evt, messageText)
+
+	// Cek apakah ini template command yang juga perlu admin access
+	templateCommands := []string{".listtemplates", ".alltemplates", ".previewtemplate", ".help"}
+	for _, cmd := range templateCommands {
+		if strings.HasPrefix(lowerText, cmd) {
+			// Semua command auto promote sekarang hanya untuk admin
+			if h.adminCommandHandler != nil {
+				// Cek apakah user adalah admin
+				if !h.isUserAdmin(evt.Info.Sender.User) {
+					return `❌ *AKSES DITOLAK*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+			        *TIDAK ADA IZIN*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Command ini hanya bisa digunakan oleh admin.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *INFORMASI*
+• Hanya admin yang memiliki akses.
+• Hubungi admin untuk bantuan.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔒 *Akses terbatas untuk keamanan sistem*`
+				}
+				return h.promoteCommandHandler.HandlePromoteCommands(evt, messageText)
+			}
+			return "" // Tidak ada response jika handler tidak tersedia
+		}
 	}
-	
-	return "❌ Auto promote commands tidak tersedia"
+
+	return "" // Tidak ada response untuk command yang tidak dikenal
+}
+
+// isUserAdmin mengecek apakah user adalah admin
+func (h *MessageHandler) isUserAdmin(userNumber string) bool {
+	if h.adminCommandHandler == nil {
+		return false
+	}
+	return h.adminCommandHandler.IsUserAdmin(userNumber)
 }

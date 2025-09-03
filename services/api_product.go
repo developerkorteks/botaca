@@ -60,7 +60,24 @@ func (s *APIProductService) FetchProductsAndCreateTemplates() (string, error) {
 	}
 
 	if len(products) == 0 {
-		return "❌ Tidak ada produk yang ditemukan dari API", nil
+		return `ℹ️ *TIDAK ADA PRODUK*
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+	          *API KOSONG*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚫 Tidak ada produk yang ditemukan dari API saat ini.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💡 *KEMUNGKINAN PENYEBAB*
+• Server API sedang dalam maintenance.
+• Belum ada produk yang ditambahkan di API.
+• Terjadi kesalahan filter pada API.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 *Coba lagi nanti atau hubungi admin API*`, nil
 	}
 
 	// Group produk per 15 dan buat template gabungan
@@ -73,17 +90,18 @@ func (s *APIProductService) FetchProductsAndCreateTemplates() (string, error) {
 		if end > len(products) {
 			end = len(products)
 		}
-		
+
 		productGroup := products[i:end]
 		templateContent := s.generateGroupedProductTemplate(productGroup, i/groupSize+1)
 		templateTitle := fmt.Sprintf("Paket Group %d (%d Produk)", i/groupSize+1, len(productGroup))
-		
+
 		_, err := s.templateService.CreateTemplate(templateTitle, templateContent, "produk_api_group")
 		if err != nil {
-			errors = append(errors, fmt.Sprintf("Gagal membuat template group %d: %v", i/groupSize+1, err))
+			s.logger.Errorf("Failed to create template group %d: %v", i/groupSize+1, err)
+			errors = append(errors, fmt.Sprintf("Group %d: %v", i/groupSize+1, err))
 			continue
 		}
-		
+
 		createdCount++
 		s.logger.Infof("Created template group %d with %d products", i/groupSize+1, len(productGroup))
 	}
@@ -91,21 +109,58 @@ func (s *APIProductService) FetchProductsAndCreateTemplates() (string, error) {
 	// Buat response
 	var result strings.Builder
 	result.WriteString("🛒 *UPDATE PRODUK DARI API*\n\n")
-	result.WriteString(fmt.Sprintf("✅ **Berhasil:** %d template group dibuat\n", createdCount))
-	result.WriteString(fmt.Sprintf("📦 **Total Produk:** %d (digroup per %d)\n", len(products), groupSize))
-	
+
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+	result.WriteString("          *HASIL FETCH API*\n")
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
+
+	result.WriteString("📊 *STATISTIK IMPORT*\n")
+	result.WriteString(fmt.Sprintf("✅ *Berhasil:* %d template group\n", createdCount))
+	result.WriteString(fmt.Sprintf("📦 *Total Produk:* %d\n", len(products)))
+	result.WriteString(fmt.Sprintf("📋 *Per Group:* %d produk\n", groupSize))
+
 	if len(errors) > 0 {
-		result.WriteString(fmt.Sprintf("❌ **Gagal:** %d group\n", len(errors)))
+		result.WriteString(fmt.Sprintf("❌ *Gagal:* %d group\n", len(errors)))
+		result.WriteString("\n🔍 *Detail Error:*\n")
+		for i, errMsg := range errors {
+			if i < 3 { // Tampilkan maksimal 3 error pertama
+				result.WriteString(fmt.Sprintf("• %s\n", errMsg))
+			}
+		}
+		if len(errors) > 3 {
+			result.WriteString(fmt.Sprintf("• ... dan %d error lainnya\n", len(errors)-3))
+		}
 	}
-	
+
 	if createdCount > 0 {
-		result.WriteString("\n💡 **Info:**\n")
-		result.WriteString("• Template produk sudah digroup dan ditambahkan\n")
+		result.WriteString("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+		result.WriteString("📋 *INFORMASI SISTEM*\n")
+		result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
+		result.WriteString("• Template produk sudah digroup\n")
 		result.WriteString("• Setiap template berisi 15 produk\n")
-		result.WriteString("• Auto promote akan random pilih group template")
+		result.WriteString("• Auto promote pilih random group\n")
+		result.WriteString("• Format WhatsApp sudah optimized\n")
+
+		result.WriteString("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+		result.WriteString("🎮 *COMMANDS SELANJUTNYA*\n")
+		result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
+		result.WriteString("• *.listtemplates*\n")
+		result.WriteString("  _Lihat template yang dibuat_\n\n")
+		result.WriteString("• *.templatestats*\n")
+		result.WriteString("  _Statistik semua template_\n\n")
+		result.WriteString("• *.testgroup [ID]*\n")
+		result.WriteString("  _Test kirim ke grup_")
 	}
 
 	return result.String(), nil
+}
+
+// Helper function untuk max
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
 
 // fetchProductsFromAPI mengambil data produk dari API
@@ -156,91 +211,62 @@ func (s *APIProductService) fetchProductsFromAPI() ([]Product, error) {
 // generateGroupedProductTemplate membuat template promosi untuk group produk
 func (s *APIProductService) generateGroupedProductTemplate(products []Product, groupNum int) string {
 	var template strings.Builder
-	
+
 	template.WriteString(fmt.Sprintf(`🛒 *PAKET DATA GROUP %d*
 
-🔥 *PROMO TERBATAS!* 
-Stok menipis, buruan order!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          *PROMO TERBATAS!*
+        _Stok menipis, buruan!_
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-━━━━━━━━━━━━━━━━━━━━━━
+📋 *DAFTAR PAKET TERSEDIA*
 
 `, groupNum))
 
-	// Tambahkan daftar produk (hanya yang ada, tidak paksa 15)
-	for _, product := range products {
+	// Tambahkan daftar produk dengan format yang lebih ringkas
+	for i, product := range products {
 		// Validasi data produk
 		if product.PackageNameShort == "" || product.PackageHarga == "" {
 			continue // Skip produk dengan data kosong
 		}
-		
-		template.WriteString(fmt.Sprintf("📱 **%s**\n", product.PackageNameShort))
-		template.WriteString(fmt.Sprintf("💰 %s (Harga / Jasa DOR, baca deskripsi bot dor)\n\n", product.PackageHarga))
+
+		template.WriteString(fmt.Sprintf("📱 *%s* - %s\n", product.PackageNameShort, product.PackageHarga))
+
+		if i < len(products)-1 {
+			template.WriteString("\n")
+		}
 	}
 
-	// Tambahkan teknik FOMO dan promosi
-	template.WriteString(`━━━━━━━━━━━━━━━━━━━━━━
+	// Tambahkan informasi singkat dan contact
+	template.WriteString(`
 
-⚡ *KENAPA PILIH KAMI?*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-🤖 *Malas lihat Telegram yang ribet?*
-   WhatsApp aja cukup! Simple & user-friendly
+✅ *Paket RESMI* = GARANSI PENUH 
+⚠️ *Paket DOR* = TANPA GARANSI
+💰 *Harga tertera* = Harga/Jasa DOR
 
-📱 *Pengen privasi lebih?*
-   Telegram kami siap melayani dengan fitur lengkap!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           *ORDER SEKARANG*
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-━━━━━━━━━━━━━━━━━━━━━━
+🤖 *BOT OTOMATIS*
+📱 *WhatsApp:* wa.me/6287786388052
+🤖 *Telegram:* t.me/grnstoreofficial_bot
 
-🛡️ *JAMINAN KEPERCAYAAN:*
-✅ Paket RESMI = GARANSI PENUH 
-⚠️ Paket DOR = TANPA GARANSI
-💰 Harga tertera = Harga / Jasa DOR
-📖 Baca deskripsi bot untuk detail paket DOR
-💯 Transparansi total untuk kepercayaan Anda!
+👨‍💼 *ADMIN MANUAL*
+📱 *Admin 1:* wa.me/6285150588080
+📱 *Admin 2:* wa.me/6285117557905
 
-━━━━━━━━━━━━━━━━━━━━━━
+👥 *JOIN GROUP*
+🔗 *Group Chat:* chat.whatsapp.com/IeIXOndIoFr0apnlKzghUC
 
-🌐 **VPN INJECT TERSEDIA:**
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📱 *Android VPN:*
-🇸🇬 Server SG: Rp 8.000/bulan
-   • Max 2 IP • 900GB Bandwidth
+🟢 *JAM BUKA:* 01:00 - 23:00 WIB
+⏰ *BURUAN ORDER!* Stok terbatas!
 
-📺 *STB VPN:*  
-🇸🇬 Server SG: Rp 8.000/bulan
-   • Max 1 IP • 900GB Bandwidth
-🇮🇩 Server Indo: Rp 15.000/bulan
-   • Max 1 IP • 900GB Bandwidth
-
-🖥️ *PC/Laptop VPN:*
-🇮🇩 Server Indo: Rp 10.000/bulan
-   • Max 3 IP • 900GB Bandwidth
-
-━━━━━━━━━━━━━━━━━━━━━━
-
-🎯 *ORDER SEKARANG:*
-
-🤖 *BOT OTOMATIS:*
-📱 WhatsApp: wa.me/6287786388052
-🤖 Telegram: https://t.me/grnstoreofficial_bot
-
-👨‍💼 *ADMIN MANUAL:*
-📱 Admin 1: wa.me/6285150588080
-📱 Admin 2: wa.me/6285117557905
-
-👥 *JOIN GROUP:*
-🔗 https://chat.whatsapp.com/IeIXOndIoFr0apnlKzghUC
-
-⏰ *JAM OPERASIONAL:*
-   🟢 BUKA: 01:00 - 23:00 WIB
-   🔴 TUTUP: 23:00 - 01:00 WIB
-   📞 Respon cepat di jam operasional
-
-━━━━━━━━━━━━━━━━━━━━━━
-
-⏰ *BURUAN!* Stok terbatas!
-🔥 *FOMO ALERT:* Yang ragu pasti nyesal!
-
-#PaketData #VPN #GRNStore #OrderSekarang`)
+#PaketData #GRNStore #OrderSekarang`)
 
 	return template.String()
 }
@@ -252,7 +278,7 @@ func (s *APIProductService) generateProductTemplate(product Product) string {
 	if len(description) > 200 {
 		description = description[:200] + "..."
 	}
-	
+
 	template := fmt.Sprintf(`📱 *%s*
 
 💰 **Harga:** %s
@@ -309,7 +335,7 @@ func (s *APIProductService) GetProductStats() (string, error) {
 
 	dailyLimitCount := 0
 	noLoginCount := 0
-	
+
 	for _, product := range products {
 		if product.HaveDailyLimit {
 			dailyLimitCount++
@@ -321,15 +347,20 @@ func (s *APIProductService) GetProductStats() (string, error) {
 
 	var result strings.Builder
 	result.WriteString("📊 *STATISTIK PRODUK API*\n\n")
-	result.WriteString(fmt.Sprintf("📦 **Total Paket:** %d\n", len(products)))
-	result.WriteString(fmt.Sprintf("⏰ **Dengan Daily Limit:** %d\n", dailyLimitCount))
-	result.WriteString(fmt.Sprintf("🔓 **Tanpa Login:** %d\n", noLoginCount))
-	result.WriteString(fmt.Sprintf("🔐 **Perlu Login:** %d\n\n", len(products)-noLoginCount))
-	
-	result.WriteString("💡 **Info:**\n")
-	result.WriteString("• Semua paket dari API GRN Store\n")
-	result.WriteString("• Data diambil real-time dari server\n")
-	result.WriteString("• Gunakan .fetchproducts untuk update template")
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+	result.WriteString("           *RINGKASAN PRODUK*\n")
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
+	result.WriteString(fmt.Sprintf("📦 *Total Paket Tersedia:* %d\n", len(products)))
+	result.WriteString(fmt.Sprintf("⏰ *Paket dengan Limit Harian:* %d\n", dailyLimitCount))
+	result.WriteString(fmt.Sprintf("🔓 *Paket Tanpa Login:* %d\n", noLoginCount))
+	result.WriteString(fmt.Sprintf("🔐 *Paket Perlu Login:* %d\n", len(products)-noLoginCount))
+
+	result.WriteString("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
+	result.WriteString("           *INFORMASI TAMBAHAN*\n")
+	result.WriteString("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n")
+	result.WriteString("• Semua paket bersumber dari API GRN Store.\n")
+	result.WriteString("• Data statistik ini diambil secara real-time.\n")
+	result.WriteString("• Gunakan *.fetchproducts* untuk memperbarui template.")
 
 	return result.String(), nil
 }

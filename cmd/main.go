@@ -81,11 +81,14 @@ func main() {
 		// Setup services
 		templateService = services.NewTemplateService(promoteRepo, logger)
 		autoPromoteService = services.NewAutoPromoteService(client, promoteRepo, logger)
+		// Set interval dari konfigurasi
+		autoPromoteService.SetInterval(promoteCfg.AutoPromoteInterval)
 		apiProductService := services.NewAPIProductService(templateService, logger)
+		groupManagerService := services.NewGroupManagerService(client, promoteRepo, logger)
 		
 		// Setup command handlers
 		promoteCommandHandler = handlers.NewPromoteCommandHandler(autoPromoteService, templateService, logger)
-		adminCommandHandler = handlers.NewAdminCommandHandler(autoPromoteService, templateService, apiProductService, logger, promoteCfg.AdminNumbers)
+		adminCommandHandler = handlers.NewAdminCommandHandler(autoPromoteService, templateService, apiProductService, groupManagerService, logger, promoteCfg.AdminNumbers)
 		
 		logger.Success("Auto Promote System initialized!")
 	}
