@@ -224,7 +224,7 @@ func (s *APIProductService) generateGroupedProductTemplate(products []Product, g
 • Multipath • Wildcard
 
 🌍 *SERVERS:*
-🇮🇩 ID: wa.me/6285150588080
+🇮🇩 ID: wa.me/6287786388052
 🇸🇬 SG: t.me/grnstoreofficial_bot
 
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
@@ -283,7 +283,7 @@ _Stok menipis, buruan order!_
 📞 *ORDER CENTER*
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
-🇮🇩 *VPN ID:* wa.me/6285150588080
+🇮🇩 *VPN ID:* wa.me/6287786388052
 🇸🇬 *VPN SG:* t.me/grnstoreofficial_bot
 
 🛒 *PAKET DATA:*
@@ -326,7 +326,7 @@ func (s *APIProductService) generateProductTemplate(product Product) string {
 • Multipath • Wildcard
 
 🌍 *SERVERS:*
-🇮🇩 ID: wa.me/6285150588080
+🇮🇩 ID: wa.me/6287786388052
 🇸🇬 SG: t.me/grnstoreofficial_bot
 
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
@@ -340,7 +340,7 @@ func (s *APIProductService) generateProductTemplate(product Product) string {
 📞 *ORDER CENTER*
 ▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
-🇮🇩 *VPN ID:* wa.me/6285150588080
+🇮🇩 *VPN ID:* wa.me/6287786388052
 🇸🇬 *VPN SG:* t.me/grnstoreofficial_bot
 
 🛒 *PAKET DATA:*
