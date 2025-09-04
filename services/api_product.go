@@ -291,7 +291,7 @@ _Stok menipis, buruan order!_
 🤖 t.me/grnstoreofficial_bot
 
 👨‍💼 *ADMIN:*
-📱 wa.me/6285150588080
+📱 wa.me/6287786388052
 📱 wa.me/6285117557905
 
 👥 *GROUP:* chat.whatsapp.com/IeIXOndIoFr0apnlKzghUC
@@ -348,7 +348,7 @@ func (s *APIProductService) generateProductTemplate(product Product) string {
 🤖 t.me/grnstoreofficial_bot
 
 👨‍💼 *ADMIN:*
-📱 wa.me/6285150588080
+📱 wa.me/6287786388052
 📱 wa.me/6285117557905
 
 👥 *GROUP:* chat.whatsapp.com/IeIXOndIoFr0apnlKzghUC
