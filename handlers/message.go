@@ -100,10 +100,8 @@ func (h *MessageHandler) handlePersonalMessage(evt *events.Message, messageText 
 		return
 	}
 
-	// Jika bukan command dan auto reply personal diaktifkan
-	if h.autoReplyPersonal {
-		h.sendAutoReply(evt.Info.Chat, messageText, false)
-	}
+	// Bot tidak memberikan auto reply untuk non-admin
+	// Hanya merespon command auto promote dari admin
 }
 
 // handleGroupMessage menangani pesan dari grup
@@ -133,88 +131,14 @@ func (h *MessageHandler) handleCommand(evt *events.Message, messageText string) 
 	if h.isAutoPromoteCommand(lowerText) {
 		response = h.handleAutoPromoteCommand(evt, messageText)
 	} else {
-		// Daftar command yang tersedia
-		switch {
-		case lowerText == "/start":
-			response = `🤖 *BOT AKTIF*
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-			        *SELAMAT DATANG*
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-✨ Halo! Saya adalah bot WhatsApp yang siap membantu Anda.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-💡 *COMMANDS*
-• Ketik */help* untuk melihat daftar command.
-• Ketik */info* untuk detail tentang bot ini.
-• Ketik */status* untuk cek status sistem.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🚀 *Siap melayani!*`
-
-		case lowerText == "/help":
-			response = h.getHelpMessage()
-
-		case lowerText == "/ping":
-			response = `🏓 *PONG!*
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-			        *KONEKSI STABIL*
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-✅ Bot aktif dan merespon dengan baik.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-• *Status:* Online
-• *Layanan:* Berjalan normal
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
-
-		case lowerText == "/info":
-			response = h.getInfoMessage()
-
-		case lowerText == "/status":
-			response = h.getStatusMessage()
-
-		case strings.HasPrefix(lowerText, "/promote"):
-			// Command promote untuk grup (akan diimplementasi nanti)
-			response = `🔧 *FITUR DALAM PENGEMBANGAN*
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-			        *SEGERA HADIR*
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Fitur promote sedang dalam tahap pengembangan.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-💡 *Nantikan update selanjutnya!*`
-
-		default:
-			response = `❓ *COMMAND TIDAK DIKENAL*
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-			        *PERINTAH SALAH*
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Command yang Anda masukkan tidak valid.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-💡 *BANTUAN*
-• Ketik */help* untuk melihat daftar command.
-• Pastikan penulisan command sudah benar.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`
-		}
+		// Tidak ada response untuk command yang tidak dikenal
+		return
 	}
 
-	// Kirim response
-	h.sendMessage(evt.Info.Chat, response)
+	// Kirim response jika ada
+	if response != "" {
+		h.sendMessage(evt.Info.Chat, response)
+	}
 }
 
 // sendAutoReply mengirim balasan otomatis
